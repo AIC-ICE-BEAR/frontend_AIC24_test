@@ -13,7 +13,9 @@ function App() {
                   </h1>
         </header>
         <main>
-                  <Sidebar />
+            <div ClassName='row'>
+                    <Sidebar />
+            </div>
         </main>
         <footer>
                   <p>

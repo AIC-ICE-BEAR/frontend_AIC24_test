@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import logo from '../logo.svg';
 function SidebarApp() {
       const [queryMode, setQueryMode] = useState('text');
       const [numImages, setNumImages] = useState(20);
@@ -59,6 +60,16 @@ function SidebarApp() {
         }
         
       };
+      //hàm xử lí trong react
+      // const [path2img,setPath2img]=useState('')
+      const extract_name_img=(vid_name,kf_id)=>{
+            // Chuyển số thành chuỗi và thêm các số 0 ở đầu cho đủ 4 ký tự
+            let formattedNumber = kf_id.toString().padStart(4, '0');
+            // Thêm đuôi '.jpg'
+            let name_img= `${formattedNumber}.jpg`;
+            // setPath2img(name_img)
+            return name_img
+      }
 
       return (// trong mỗi chỗ return v tất cả thẻ liền kề(cùng cấp) phải được bao bọc bởi 1 thẻ đóng
 
@@ -140,7 +151,13 @@ function SidebarApp() {
                                   <p>Video Name: {item.video_name}</p>
                                   <p>Keyframe ID: {item.keyframe_id}</p>
                                   <p>Score: {item.score}</p>
+                                  {/* <img src={logo} className="App-logo" alt="logo" /> */}
+                                  {/* cần có hàm extreact file img name ở đoạn này */}
+                                  {/* <img src={`${process.env.PUBLIC_URL}/key_frames/Keyframes_L01/L01_V001/0002.jpg`} className="img" alt={item.keyframe_id}/> */}
+                                  <img src={`${process.env.PUBLIC_URL}/key_frames/Keyframes_`+item.video_name.slice(0,3)+'/'+item.video_name+'/'+ extract_name_img(item.video_name,item.keyframe_id)} className="img" alt={item.keyframe_id}/>
+                                  <p>{`${process.env.PUBLIC_URL}/key_frames/Keyframes_`+item.video_name.slice(0,3)+'/'+item.video_name+'/'+ extract_name_img(item.video_name,item.keyframe_id)}</p>
                                 </div>
+                                
                               ))}
 
                   </div>

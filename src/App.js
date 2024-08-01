@@ -1,6 +1,8 @@
 import Sidebar from './components/Sidebar';
 import DisplayResult from './components/ResultDisplay';
 import { SearchResultProvider } from './contexts/ClipsearchContext';
+import { OCRresultProvider } from './contexts/OCRsearchContext';
+import { ASRResultProvider } from './contexts/ASRsearchContext';
 import { ModeContextProvider } from './contexts/searchModeContext';
 import axios from 'axios';
 import './App.css';
@@ -8,6 +10,8 @@ import './App.css';
 
 function App() {
   return (
+    <ASRResultProvider>
+    <OCRresultProvider>
     <ModeContextProvider>
       <SearchResultProvider>
         <div className="text-center h-full flex flex-col">
@@ -24,6 +28,8 @@ function App() {
         </div>
       </SearchResultProvider>
     </ModeContextProvider>
+    </OCRresultProvider>
+    </ASRResultProvider>
   );
 }
 

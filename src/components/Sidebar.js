@@ -1,57 +1,57 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Clipservice from "../services/ClipService"
+import { useSearchResult } from '../contexts/ClipsearchContext';
+import { useModeContext } from '../contexts/searchModeContext';
 import Switch from "react-switch";
 import Divider from '@mui/material/Divider';
 
 function SidebarApp({ style }) {
+  const { setSearchResult } = useSearchResult();
   const [ModelSelect, setModelSelect] = useState('CLIP 5B');
-  const [queryMode, setQueryMode] = useState('text');
   const [numImages, setNumImages] = useState(20);
-  const [model, setModel] = useState('ViT-B/32');
   const [Textquery, setTextquery] = useState('');
   const [ASRquery, setASRquery] = useState('');
   const [OCRquery, setOCRquery] = useState('');
-  const [results, setResults] = useState([]);
+
   const [QueryLanguage, setQueryLanguage] = useState('English');
   const [isLanguageSwitchChecked, setIsLanguageSwitchChecked] = useState(false);
   const [status, setStatus] = useState({ code: 200, message: 'Accepted' });
-
+  const {searchMode, setSearchMode} = useModeContext(); 
   const handleLanguageSwitch = (checked) => {
     setIsLanguageSwitchChecked(checked);
     setQueryLanguage(checked ? "Eng" : "Vie");
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      console.log("send request")
-      if (queryMode === "text"){
-        sendrequets_clip();
-      }
-      else if (queryMode === "ocr"){
-        sendrequets_ocr();
-      }
-    }
-  };
+ 
 
   const sendrequets_clip = async () => {
+    console.log("send request");
+    setSearchMode('text')
     try {
-        const response = await axios.post('http://localhost:8000/search', {"query": [Textquery], "k": numImages, "model": model,"language":QueryLanguage});
-        console.log(response.data);
-        setResults(response.data);
+      const response = await Clipservice.sendClipRequest(Textquery, numImages, ModelSelect, QueryLanguage);
+      setSearchResult(response.data.search_result);
+      // setStatus({ code: 200, message: "Successful" });
     } catch (error) {
-        if (error.response) {
-            alert(`Search failed: ${error.response.data.detail}`);
-        } else {
-            alert('failed: Network error');
-        }
+      console.log(error);
+      // setStatus({ code: error.status || 500, message: error.message || 'Failed' });
     }
   };
 
-  const sendrequets_ocr = async () => {
-    try {
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      sendrequets_clip();
+    }
+  };
+
+  const sendrequets_ocr = async (e) => {
+    if (e.key === 'Enter') {
+      console.log("send request")
+      setSearchMode('text')
+      try {
         const response = await axios.post('http://localhost:8000/search_OCR', {"query": [OCRquery], "k": numImages});
         console.log(response.data);
-        setResults(response.data);
+    
     } catch (error) {
         if (error.response) {
             alert(`Search failed: ${error.response.data.detail}`);
@@ -59,6 +59,29 @@ function SidebarApp({ style }) {
             alert('failed: Network error');
         }
     }
+    }
+    
+  };
+
+
+
+  const sendrequets_asr = async (e) => {
+    if (e.key === 'Enter') {
+      console.log("send request")
+      setSearchMode('asr')
+      try {
+        const response = await axios.post('http://localhost:8000/search_OCR', {"query": [OCRquery], "k": numImages});
+        console.log(response.data);
+    
+    } catch (error) {
+        if (error.response) {
+            alert(`Search failed: ${error.response.data.detail}`);
+        } else {
+            alert('failed: Network error');
+        }
+    }
+    }
+    
   };
 
   return (
@@ -73,8 +96,8 @@ function SidebarApp({ style }) {
           </div>
           <div>
             {/* Model 2 */ }
-            <label>CLIP BigG</label>
-            <input type="radio" name="queryMode" value="CLIP BigG" checked={ModelSelect === 'CLIP BigG'} onChange={(e) => setModelSelect(e.target.value)} />
+            <label>ViT-bigG-14</label>
+            <input type="radio" name="queryMode" value="ViT-bigG-14" checked={ModelSelect === 'ViT-bigG-14'} onChange={(e) => setModelSelect(e.target.value)} />
           </div>
           <div>
             {/* Model 3 */ }

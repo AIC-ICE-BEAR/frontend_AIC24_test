@@ -16,6 +16,6 @@ export const ModeContextProvider = ({ children }) => {
 };
 
 // Custom hook to use the SearchResultContext
-export const useSearchResult = () => {
+export const useModeContext = () => {
   return useContext(ModeContext);
 };

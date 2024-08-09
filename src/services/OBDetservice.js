@@ -1,15 +1,15 @@
 import axios from "axios";
 
-class ASRService {
+class OBDetService {
   constructor() {
     this.axiosInstance = axios.create({
       baseURL: 'http://localhost:8000/', 
     });
   }
 
-  async sendASRRequest(query, numImages, model) {
+  async sendOBDetRequest(query, numImages, model) {
     try {
-      const response = await this.axiosInstance.post('/obdetsearch ', {
+      const response = await this.axiosInstance.post('/obdetsearch', {
         "query": [query],
         "k": numImages,
         "model": model
@@ -23,6 +23,6 @@ class ASRService {
   }
 }
 
-const ASRservice = new ASRService();
-export default ASRservice;
+const OBDetservice = new OBDetService();
+export default OBDetservice;
 

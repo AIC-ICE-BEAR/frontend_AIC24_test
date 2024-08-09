@@ -3,6 +3,7 @@ import DisplayResult from './components/ResultDisplay';
 import { SearchResultProvider } from './contexts/ClipsearchContext';
 import { OCRresultProvider } from './contexts/OCRsearchContext';
 import { ASRResultProvider } from './contexts/ASRsearchContext';
+import { OBDetResultProvider } from './contexts/OBDetsearchContext'
 import { ModeContextProvider } from './contexts/searchModeContext';
 import axios from 'axios';
 import './App.css';
@@ -10,6 +11,7 @@ import './App.css';
 
 function App() {
   return (
+    <OBDetResultProvider >
     <ASRResultProvider>
     <OCRresultProvider>
     <ModeContextProvider>
@@ -30,6 +32,7 @@ function App() {
     </ModeContextProvider>
     </OCRresultProvider>
     </ASRResultProvider>
+    </OBDetResultProvider>
   );
 }
 

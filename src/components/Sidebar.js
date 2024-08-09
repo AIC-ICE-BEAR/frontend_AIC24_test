@@ -8,7 +8,7 @@ import Divider from '@mui/material/Divider';
 
 function SidebarApp({ style }) {
   const { setSearchResult } = useSearchResult();
-  const [ModelSelect, setModelSelect] = useState('CLIP 5B');
+  const [ModelSelect, setModelSelect] = useState('ViT-bigG-14');
   const [numImages, setNumImages] = useState(20);
   const [Textquery, setTextquery] = useState('');
   const [ASRquery, setASRquery] = useState('');
@@ -43,6 +43,17 @@ function SidebarApp({ style }) {
       sendrequets_clip();
     }
   };
+
+  const handleChange = (e) => {
+    setTextquery(e.target.value);
+    autoResize(e);
+  };
+
+  const autoResize = (e) => {
+      e.target.style.height = 'auto';
+      e.target.style.height = `${e.target.scrollHeight}px`;
+  };
+
 
   const sendrequets_ocr = async (e) => {
     if (e.key === 'Enter') {
@@ -85,24 +96,24 @@ function SidebarApp({ style }) {
   };
 
   return (
-    <div className="block" style={style}>
+    <div className="block  overflow-y-auto h-screen" style={style}>
       <div className="query-controls mb-5">
         <p>TEXT</p>
         <div className="flex items-center gap-8">
           <div>
             {/* Model 1 */ }
-            <label>CLIP 5B</label>
-            <input type="radio" name="queryMode" value="CLIP 5B" checked={ModelSelect === 'CLIP 5B'} onChange={(e) => setModelSelect(e.target.value)} />
-          </div>
-          <div>
-            {/* Model 2 */ }
             <label>ViT-bigG-14</label>
             <input type="radio" name="queryMode" value="ViT-bigG-14" checked={ModelSelect === 'ViT-bigG-14'} onChange={(e) => setModelSelect(e.target.value)} />
           </div>
           <div>
+            {/* Model 2 */ }
+            <label>ViT 5b</label>
+            <input type="radio" name="queryMode" value="ViT 5b" checked={ModelSelect === 'ViT 5b'} onChange={(e) => setModelSelect(e.target.value)} />
+          </div>
+          <div>
             {/* Model 3 */ }
-            <label>BLIP 2</label>
-            <input type="radio" name="queryMode" value="BLIP 2" checked={ModelSelect === 'BLIP 2'} onChange={(e) => setModelSelect(e.target.value)} />
+            <label>Blip2-ViTG</label>
+            <input type="radio" name="queryMode" value="Blip2-ViTG" checked={ModelSelect === 'Blip2-ViTG'} onChange={(e) => setModelSelect(e.target.value)} />
           </div>
         </div>
 
@@ -116,17 +127,21 @@ function SidebarApp({ style }) {
         {/* Top K images */}
         <div className="flex items-center justify-center my-4 gap-2">
           <label>K</label>
-          <input type="range" min="1" max="100" value={numImages} onChange={(e) => setNumImages(e.target.value)} />
+          <input type="range" min="1" max="200" value={numImages} onChange={(e) => setNumImages(e.target.value)} />
           <label>{numImages}</label>
         </div>
 
         {/* CLIP Query text box */}
         <div className=" text-mode-options">
-          <input className="mx-auto h-20 w-60 border-2 border-solid border-black" 
-                  type="text" 
-                  placeholder='fill query and press enter' 
-                  value={Textquery } onChange={(e) => setTextquery(e.target.value)} 
-                  onKeyPress={handleKeyPress} />
+          <textarea
+              className="mx-auto h-auto min-h-[5rem] w-60 border-2 border-solid border-black resize-none overflow-hidden"
+              placeholder="fill query and press enter"
+              value={Textquery}
+              onChange={handleChange}
+              onKeyPress={handleKeyPress}
+              rows="1"
+              style={{ height: 'auto' }}
+          />
         </div>
       </div>
       <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700"></hr>
@@ -147,6 +162,20 @@ function SidebarApp({ style }) {
       <div className='mb-5'>
         <p>OCR</p>
         {/* OCR Query text box */}
+        <div className="text-mode-options">
+        <input className="mx-auto h-20 w-60 border-2 border-solid border-black" 
+                  type="text" 
+                  placeholder='fill query and press enter' 
+                  value={OCRquery } onChange={(e) => setOCRquery(e.target.value)} 
+                  onKeyPress={handleKeyPress} />
+        </div>
+      </div>
+
+      <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+
+      <div className='mb-5'>
+        <p>OBJECT DETECTION</p>
+        {/* OB detection Query text box */}
         <div className="text-mode-options">
         <input className="mx-auto h-20 w-60 border-2 border-solid border-black" 
                   type="text" 

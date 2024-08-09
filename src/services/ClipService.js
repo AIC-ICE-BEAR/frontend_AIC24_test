@@ -3,7 +3,7 @@ import axios from "axios";
 class ClipService {
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: 'http://localhost:8000/', 
+      baseURL: 'http://34.87.152.224:8000/', 
     });
   }
 
@@ -26,21 +26,3 @@ class ClipService {
 const Clipservice = new ClipService();
 export default Clipservice;
 
-
-// class ClipService {
-//   async sendClipRequest(query, numImages, model, language) {
-//     try {
-//       const response = await this.axiosInstance.post('http://35.240.132.220:8000/search', {
-//         query: [query],
-//         k: numImages,
-//         model: model,
-//         language: language
-//       });
-//       return response.data;
-//     } catch (error) {
-//       throw error.response ? new Error(error.response.data.detail) : new Error('Network error');
-//     }
-//   }
-// }
-// const Clipservice = new ClipService();
-// export default Clipservice

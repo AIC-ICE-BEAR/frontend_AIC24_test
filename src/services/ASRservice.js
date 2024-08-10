@@ -3,21 +3,20 @@ import axios from "axios";
 class ASRService {
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: 'http://localhost:8000/', 
+      baseURL: process.env.REACT_APP_BASE_URL, 
     });
   }
 
-  async sendASRRequest(query, numImages, model) {
+  async sendASRRequest(query, numImages) {
     try {
       const response = await this.axiosInstance.post('/obdetsearch ', {
         "query": [query],
-        "k": numImages,
-        "model": model
+        "k": numImages
       });
       return { data: response.data, status: response.status };
     } catch (error) {
       const status = error.response ? error.response.status : null;
-      const message = error.response ? error.response.data.detail : 'Network error';
+      const message ="ASR search" + error.response ? error.response.data.detail : 'Network error';
       throw { status, message };
     }
   }

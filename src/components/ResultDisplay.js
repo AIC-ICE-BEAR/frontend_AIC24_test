@@ -181,9 +181,9 @@ function DisplayResult({ style }) {
         )}
 
         {/* For ASR search */}
-        {result && searchMode === 'asr' && (
+        {displayResult && searchMode === 'asr' && (
           <div className="overflow-y-auto h-screen" ref={scrollContainerRef}>
-            {result.map((item, index) => (
+            {displayResult.map((item, index) => (
               <div key={index} className="border border-gray-300 p-1 bg-white my-2">
                 <div className="grid grid-cols-5 gap-2 " >
                   {item.key_frames.map((key_id, index) => (

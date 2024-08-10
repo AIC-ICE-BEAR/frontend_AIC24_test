@@ -3,7 +3,7 @@ import axios from "axios";
 class ClipService {
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: 'http://34.87.152.224:8000/', 
+      baseURL: process.env.REACT_APP_BASE_URL, 
     });
   }
 
@@ -17,7 +17,7 @@ class ClipService {
       return { data: response.data, status: response.status };
     } catch (error) {
       const status = error.response ? error.response.status : null;
-      const message = error.response ? error.response.data.detail : 'Network error';
+      const message = "Clip search" + error.response ? error.response.data.detail : 'Network error';
       throw { status, message };
     }
   }

@@ -5,7 +5,8 @@ import { OCRresultProvider } from './contexts/OCRsearchContext';
 import { ASRResultProvider } from './contexts/ASRsearchContext';
 import { OBDetResultProvider } from './contexts/OBDetsearchContext'
 import { ModeContextProvider } from './contexts/searchModeContext';
-import axios from 'axios';
+import { ToastContainer } from 'react-toastify';
+
 import './App.css';
 
 
@@ -17,6 +18,7 @@ function App() {
     <ModeContextProvider>
       <SearchResultProvider>
         <div className="text-center h-full flex flex-col">
+        <ToastContainer />
           <header className="bg-gray-800 p-5 text-white text-3xl max-h-20 max-w-full">
             <h1>Event Retrieval App</h1>
           </header>

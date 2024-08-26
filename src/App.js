@@ -5,6 +5,8 @@ import { OCRresultProvider } from './contexts/OCRsearchContext';
 import { ASRResultProvider } from './contexts/ASRsearchContext';
 import { OBDetResultProvider } from './contexts/OBDetsearchContext'
 import { ModeContextProvider } from './contexts/searchModeContext';
+import { ClipConfigProvider} from './contexts/ClipSearchConfigContext'
+import {SubmitProvider} from './contexts/SubmitImageContext';
 import { ToastContainer } from 'react-toastify';
 
 import './App.css';
@@ -12,6 +14,8 @@ import './App.css';
 
 function App() {
   return (
+    <SubmitProvider>
+    <ClipConfigProvider>
     <OBDetResultProvider >
     <ASRResultProvider>
     <OCRresultProvider>
@@ -35,6 +39,8 @@ function App() {
     </OCRresultProvider>
     </ASRResultProvider>
     </OBDetResultProvider>
+    </ClipConfigProvider>
+    </SubmitProvider>
   );
 }
 

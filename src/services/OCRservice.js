@@ -14,7 +14,9 @@ class OcrService {
         "query": [query],
         "k": numImages
       });
-      return response.data;
+
+      console.log("OCR result", response.data)
+      return { data: response.data, status: response.status };
     } catch (error) {
       const status = error.response ? error.response.status : null;
       const message = "OCR search" + error.response ? error.response.data.detail : 'Network error';

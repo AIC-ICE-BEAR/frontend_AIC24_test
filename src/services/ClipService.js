@@ -7,13 +7,15 @@ class ClipService {
     });
   }
 
-  async sendClipRequest(query, numImages, model) {
+  async sendClipRequest(query, numImages, model, language) {
     try {
       const response = await this.axiosInstance.post('/search', {
         "query": [query],
         "k": numImages,
-        "model": model
+        "model": model, 
+        "language": language
       });
+      console.log("Clip search", response.data)
       return { data: response.data, status: response.status };
     } catch (error) {
       const status = error.response ? error.response.status : null;

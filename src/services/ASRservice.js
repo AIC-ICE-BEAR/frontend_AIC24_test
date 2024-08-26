@@ -7,12 +7,15 @@ class ASRService {
     });
   }
 
-  async sendASRRequest(query, numImages) {
+  async sendASRRequest(query, mode, numImages) {
     try {
-      const response = await this.axiosInstance.post('/obdetsearch ', {
-        "query": [query],
-        "k": numImages
+      const response = await this.axiosInstance.post('/search_ASR', {
+        "query": query,
+        "k": numImages,
+        "mode": mode
       });
+
+      console.log("ASR result", response.data)
       return { data: response.data, status: response.status };
     } catch (error) {
       const status = error.response ? error.response.status : null;

@@ -15,7 +15,7 @@ class OBDetService {
         "mode" : ObtDetMode
       })
       
-      const response = await this.axiosInstance.post('/obdetsearch', {
+      const response = await this.axiosInstance.post('/search_ObjectCount', {
         "query": [query],
         "k": numImages, 
         "mode" : ObtDetMode

@@ -17,7 +17,6 @@
     "react-autocomplete": "^1.8.1",
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
-    "react-search-autocomplete": "^8.5.2",
     "react-switch": "^7.0.0",
     "react-toastify": "^10.0.5",
     "tw-elements-react": "^1.0.0-alpha-end",

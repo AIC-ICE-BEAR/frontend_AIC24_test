@@ -59,7 +59,7 @@ const SEMPanel = ({ numImages, setNumImages }) => {
         <div className="p-4 border-b">
           <div className="query-controls mb-5">
             <p>TEXT</p>
-            <div className="flex items-center gap-8">
+            <div className="flex justify-center  gap-8">
               <div>
                 <label>ViT-bigG-14</label>
                 <input

@@ -26,7 +26,7 @@ const SidebarApp = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 border-4 border-separate  w-96">
+    <div className="flex flex-col h-screen bg-gray-100 border-4 border-separate w-[20%]">
       {/* Sidebar */}
       <div className="w-full border-r  justify-start ">
         <div className="flex p-4">

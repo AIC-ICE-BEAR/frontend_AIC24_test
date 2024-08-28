@@ -4,7 +4,31 @@ import { handleKeyPressOBDet } from "./ServicesUtils";
 import { useOBDetResult } from '../contexts/OBDetsearchContext';
 import { useModeContext } from '../contexts/searchModeContext';
 import { useClipConfig } from '../contexts/ClipSearchConfigContext'
+import DroppableCanvas  from './Canvas'
 import Switch from "react-switch";
+
+
+
+const icons = [
+  { id: 'building', label: 'Building', src: 'path_to_building_icon' },
+  { id: 'person', label: 'Person', src: 'path_to_person_icon' },
+  // Add more icons here
+];
+
+const DraggableIcon = ({ icon, onDragStart }) => {
+  return (
+    <div
+      draggable
+      onDragStart={(e) => onDragStart(e, icon)}
+      className="cursor-pointer p-2"
+    >
+      <img src={icon.src} alt={icon.label} className="h-10 w-10" />
+      <p className="text-center">{icon.label}</p>
+    </div>
+  );
+};
+
+
 
 const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
   const { setOBDetResult } = useOBDetResult();
@@ -15,6 +39,42 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
   const [items, setitems] = useState([]); // Load items as before
   const [ObtDetMode, setObtDetMode] = useState('slow');
   const [ismodeSwitchChecked, setismodeSwitchChecked] = useState(false);
+  const [droppedItems, setDroppedItems] = useState([]);
+
+
+  // Canvas dropping
+
+  const handleDragStart = (e, icon) => {
+    e.dataTransfer.setData('icon', JSON.stringify(icon));
+  };
+
+  const handleDrop = (e) => {
+    const data = e.dataTransfer.getData('icon');
+    const droppedItemData = e.dataTransfer.getData('dropped-item');
+
+    const canvasRect = e.currentTarget.getBoundingClientRect(); // Get canvas position relative to the viewport
+    const dropX = e.clientX - canvasRect.left; // Adjust X position relative to the canvas
+    const dropY = e.clientY - canvasRect.top;  // Adjust Y position relative to the canvas
+
+    if (data) {
+      const icon = JSON.parse(data);
+
+      // Update the state with the new icon's position relative to the canvas
+      setDroppedItems([...droppedItems, { ...icon, x: dropX, y: dropY }]);
+    } else if (droppedItemData) {
+      const item = JSON.parse(droppedItemData);
+
+      // Update the position of the dragged item
+      const updatedItems = [...droppedItems];
+      updatedItems[item.index] = { ...updatedItems[item.index], x: dropX, y: dropY };
+      setDroppedItems(updatedItems);
+    }
+  };
+
+  const handleDelete = (index) => {
+    setDroppedItems(droppedItems.filter((_, i) => i !== index));
+  };
+
 
 
 
@@ -67,7 +127,7 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
 
   return (
     <div className='mb-5'>
-        <p>OBJECT DETECTION</p>
+        <h2 className="text-lg font-bold mb-4">Objects & Colors of the Scene</h2>
         {/* Mode select */}
         <div className="flex items-center justify-center my-4 gap-2">
           <label>Slow</label>
@@ -76,7 +136,27 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
         </div>
 
         {/* OB detection Query text box */}
-        <div className=" text-mode-options" 
+        
+
+
+        <div className="flex flex-col items-center">
+          
+
+          <div className="flex flex-wrap justify-center mb-4">
+            {icons.map((icon) => (
+              <DraggableIcon key={icon.id} icon={icon} onDragStart={handleDragStart} />
+            ))}
+          </div>
+
+          <DroppableCanvas
+            droppedItems={droppedItems}
+            handleDrop={handleDrop}
+            handleDelete={handleDelete}
+          />
+        </div>
+
+
+        <div className=" text-mode-options pt-5" 
              onKeyPress={(e) => {
               handleKeyPressOBDet(e, OBDetquery, numImages, ObtDetMode, setOBDetResult, setSearchMode)
             
@@ -102,7 +182,7 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
               }}
               onSelect={(val) => handleSelect(val)}
               inputProps={{
-                className: "shadow appearance-none border-2 rounded border-black w-80 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline",
+                className: "shadow appearance-none border-2 rounded border-black w-96 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline",
                 placeholder: "Enter queries like '2 person 1 car'",
               }}
               menuStyle={{
@@ -110,6 +190,7 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
               }}
             />
         </div>
+        
     </div>
   );
 };

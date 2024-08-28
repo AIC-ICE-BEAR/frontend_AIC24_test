@@ -2,8 +2,9 @@ import Papa from 'papaparse';
 
 export const mapKeyframe = async (videoName, keyFrameId) => {
   return new Promise((resolve, reject) => {
-    const PATH_TO_FILE_MAP = '/map-keyframes/';
-    const filePath = `${PATH_TO_FILE_MAP}${videoName}.csv`;
+    const PATH_TO_FILE_MAP = process.env.REACT_APP_MAP_KEYFRAME;
+    
+    const filePath = `${PATH_TO_FILE_MAP}/${videoName.slice(0, 3)}/${videoName}.csv`;
 
     // Fetch the CSV file from the public folder
     fetch(filePath)

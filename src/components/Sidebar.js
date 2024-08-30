@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 
-import SEMPanel from './SEMPanel';
-import OCRASRPanel from './OCRASRPanel';
-import ObjectDetectionPanel from './ObjectDetectionPanel';
+import SEMPanel from './Panels/SEMPanel';
+import OCRASRPanel from './Panels/OCRASRPanel';
+import ObjectDetectionPanel from './Panels/ObjectDetectionPanel';
 
 const SidebarApp = () => {
   const [numImages, setNumImages] = useState(20);
 
   const [activePanel, setActivePanel] = useState('SEM');
 
-  
+
 
   const renderPanel = () => {
     switch (activePanel) {
@@ -19,7 +19,7 @@ const SidebarApp = () => {
       case 'OCRASR':
         return <OCRASRPanel numImages={numImages} setNumImages={setNumImages} />;
       case 'ObjectDetection':
-        return  <ObjectDetectionPanel numImages={numImages} setNumImages={setNumImages} />;
+        return <ObjectDetectionPanel numImages={numImages} setNumImages={setNumImages} />;
       default:
         return <SEMPanel numImages={numImages} setNumImages={setNumImages} />;
     }
@@ -29,6 +29,12 @@ const SidebarApp = () => {
     <div className="flex flex-col h-screen bg-gray-100 border-4 border-separate w-[20%]">
       {/* Sidebar */}
       <div className="w-full border-r  justify-start ">
+        <div className="flex items-center justify-center my-4 gap-2">
+          <label>K</label>
+          <input type="range" min="1" max="200" value={numImages} onChange={(e) => setNumImages(e.target.value)} />
+          <label>{numImages}</label>
+        </div>
+
         <div className="flex p-4">
           <button
             className={`w-full p-2 text-center rounded mb-2 ${activePanel === 'SEM' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}

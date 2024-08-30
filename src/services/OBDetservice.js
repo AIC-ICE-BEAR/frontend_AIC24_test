@@ -3,7 +3,7 @@ import axios from "axios";
 class OBDetService {
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: process.env.REACT_APP_BASE_URL, 
+      baseURL: process.env.REACT_APP_BASE_URL,
     });
   }
 
@@ -11,17 +11,17 @@ class OBDetService {
     try {
       console.log({
         "query": [query],
-        "k": numImages, 
-        "mode" : ObtDetMode
+        "k": numImages,
+        "mode": ObtDetMode
       })
-      
+
       const response = await this.axiosInstance.post('/search_ObjectCount', {
         "query": [query],
-        "k": numImages, 
-        "mode" : ObtDetMode
+        "topk": numImages,
+        "mode": ObtDetMode
       });
 
-      
+
       return { data: response.data, status: response.status };
     } catch (error) {
       const status = error.response ? error.response.status : null;

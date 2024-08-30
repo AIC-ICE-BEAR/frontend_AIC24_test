@@ -3,7 +3,7 @@ import axios from "axios";
 class OcrService {
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: process.env.REACT_APP_BASE_URL, 
+      baseURL: process.env.REACT_APP_BASE_URL,
     });
   }
 
@@ -12,7 +12,7 @@ class OcrService {
     try {
       const response = await this.axiosInstance.post('/search_OCR', {
         "query": [query],
-        "k": numImages
+        "topk": numImages
       });
 
       console.log("OCR result", response.data)

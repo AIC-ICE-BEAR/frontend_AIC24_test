@@ -3,16 +3,16 @@ import axios from "axios";
 class ClipService {
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: process.env.REACT_APP_BASE_URL, 
+      baseURL: process.env.REACT_APP_BASE_URL,
     });
   }
 
   async sendClipRequest(query, numImages, model, language) {
     try {
       const response = await this.axiosInstance.post('/search', {
-        "query": [query],
-        "k": numImages,
-        "model": model, 
+        "query": query,
+        "topk": numImages,
+        "model": model,
         "language": language
       });
       console.log("Clip search", response.data)

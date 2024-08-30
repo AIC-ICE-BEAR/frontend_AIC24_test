@@ -3,7 +3,7 @@ import axios from "axios";
 class ASRService {
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: process.env.REACT_APP_BASE_URL, 
+      baseURL: process.env.REACT_APP_BASE_URL,
     });
   }
 
@@ -11,7 +11,7 @@ class ASRService {
     try {
       const response = await this.axiosInstance.post('/search_ASR', {
         "query": query,
-        "k": numImages,
+        "topk": numImages,
         "mode": mode
       });
 
@@ -19,7 +19,7 @@ class ASRService {
       return { data: response.data, status: response.status };
     } catch (error) {
       const status = error.response ? error.response.status : null;
-      const message ="ASR search" + error.response ? error.response.data.detail : 'Network error';
+      const message = "ASR search" + error.response ? error.response.data.detail : 'Network error';
       throw { status, message };
     }
   }

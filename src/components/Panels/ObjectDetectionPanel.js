@@ -3,30 +3,10 @@ import Autocomplete from 'react-autocomplete';
 import { handleKeyPressOBDet } from "../utils/ServicesUtils";
 import { useOBDetResult } from '../../contexts/OBDetsearchContext';
 import { useModeContext } from '../../contexts/searchModeContext';
-import { useClipConfig } from '../../contexts/ClipSearchConfigContext'
-import DroppableCanvas from '../ObjectDet/Canvas'
+import { useClipConfig } from '../../contexts/ClipSearchConfigContext';
+import DroppableCanvas, { DraggableIcon, DraggableColor } from '../ObjectDet/Canvas';
 import Switch from "react-switch";
 
-
-
-const icons = [
-  { id: 'building', label: 'Building', src: 'path_to_building_icon' },
-  { id: 'person', label: 'Person', src: 'path_to_person_icon' },
-  // Add more icons here
-];
-
-const DraggableIcon = ({ icon, onDragStart }) => {
-  return (
-    <div
-      draggable
-      onDragStart={(e) => onDragStart(e, icon)}
-      className="cursor-pointer p-2"
-    >
-      <img src={icon.src} alt={icon.label} className="h-10 w-10" />
-      <p className="text-center">{icon.label}</p>
-    </div>
-  );
-};
 
 
 
@@ -36,14 +16,44 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
   const { setClipConfig } = useClipConfig();
   const [OBDetquery, setOBDetquery] = useState('');
   const [autocompleteValue, setAutocompleteValue] = useState('');
-  const [items, setitems] = useState([]); // Load items as before
+  const [items, setItems] = useState([]); // Items from JSON
   const [ObtDetMode, setObtDetMode] = useState('slow');
   const [ismodeSwitchChecked, setismodeSwitchChecked] = useState(false);
   const [droppedItems, setDroppedItems] = useState([]);
+  const [icons, setIcons] = useState([]);
+
+  const [colors, setcolors] = useState([]);
+
+
+  // Fetch JSON data and set items and icons
+  useEffect(() => {
+    fetch('/class_names.json') // Replace with the correct path
+      .then((response) => response.json())
+      .then((data) => {
+        setItems(data);
+        // Create icons dynamically from JSON data
+        const createdIcons = data.map(item => ({
+          id: item.id.toString(),
+          label: item.name,
+          src: `path_to_icons/${item.name}.png`
+        }));
+        setIcons(createdIcons);
+      })
+      .catch((error) => console.error('Error loading items:', error));
+  }, []);
+
+
+  useEffect(() => {
+    fetch('/color_palletes.json') // Replace with the correct path
+      .then((response) => response.json())
+      .then((data) => {
+        setcolors(data);
+      })
+      .catch((error) => console.error('Error loading items:', error));
+  }, []);
 
 
   // Canvas dropping
-
   const handleDragStart = (e, icon) => {
     e.dataTransfer.setData('icon', JSON.stringify(icon));
   };
@@ -52,19 +62,15 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
     const data = e.dataTransfer.getData('icon');
     const droppedItemData = e.dataTransfer.getData('dropped-item');
 
-    const canvasRect = e.currentTarget.getBoundingClientRect(); // Get canvas position relative to the viewport
-    const dropX = e.clientX - canvasRect.left; // Adjust X position relative to the canvas
-    const dropY = e.clientY - canvasRect.top;  // Adjust Y position relative to the canvas
+    const canvasRect = e.currentTarget.getBoundingClientRect();
+    const dropX = e.clientX - canvasRect.left;
+    const dropY = e.clientY - canvasRect.top;
 
     if (data) {
       const icon = JSON.parse(data);
-
-      // Update the state with the new icon's position relative to the canvas
       setDroppedItems([...droppedItems, { ...icon, x: dropX, y: dropY }]);
     } else if (droppedItemData) {
       const item = JSON.parse(droppedItemData);
-
-      // Update the position of the dragged item
       const updatedItems = [...droppedItems];
       updatedItems[item.index] = { ...updatedItems[item.index], x: dropX, y: dropY };
       setDroppedItems(updatedItems);
@@ -75,20 +81,6 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
     setDroppedItems(droppedItems.filter((_, i) => i !== index));
   };
 
-
-
-
-  useEffect(() => {
-    // Simulate fetching from an external source
-    fetch('/class_names.json') // Replace with the correct path
-      .then((response) => response.json())
-      .then((data) => {
-        setitems(data);
-      })
-      .catch((error) => console.error('Error loading items:', error));
-  }, []);
-
-
   const autoResize = (e) => {
     e.target.style.height = 'auto';
     e.target.style.height = `${e.target.scrollHeight}px`;
@@ -98,8 +90,6 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
     setismodeSwitchChecked(checked);
     setObtDetMode(checked ? "fast" : "slow");
   };
-
-
 
   const handleInputChange = (e) => {
     setOBDetquery(e.target.value);
@@ -126,27 +116,23 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
   };
 
   return (
-    <div className='mb-5'>
+    <div className='w-full h-full mb-5 items-center'>
       <h2 className="text-lg font-bold mb-4">Objects & Colors of the Scene</h2>
-      {/* Mode select */}
-      <div className="flex items-center justify-center my-4 gap-2">
-        <label>Slow</label>
-        <Switch onChange={handlemodeSwitch} checked={ismodeSwitchChecked} onColor={'#888'} offColor={'#888'} uncheckedIcon={false} checkedIcon={true} height={20} width={53} />
-        <label>Fast</label>
-      </div>
-
-      {/* OB detection Query text box */}
-
-
 
       <div className="flex flex-col items-center">
 
-
-        <div className="flex flex-wrap justify-center mb-4">
+        <div className="grid grid-cols-12 gap-0.5 mb-4">
           {icons.map((icon) => (
             <DraggableIcon key={icon.id} icon={icon} onDragStart={handleDragStart} />
           ))}
         </div>
+
+        <div className="grid grid-cols-8 gap-2 mb-4">
+          {colors.map((color) => (
+            <DraggableColor key={color.id} icon={color} onDragStart={handleDragStart} />
+          ))}
+        </div>
+
 
         <DroppableCanvas
           droppedItems={droppedItems}
@@ -155,34 +141,35 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
         />
       </div>
 
+      {/* Autocomplete and other elements remain unchanged */}
+      <div className="flex items-center justify-center my-4 gap-2">
+        <label>slow</label>
+        <Switch onChange={handlemodeSwitch} checked={ismodeSwitchChecked} />
+        <label>fast</label>
+      </div>
 
-      <div className=" text-mode-options pt-5"
+      <div className="w-full justify-center text-mode-options pt-5"
         onKeyPress={(e) => {
-          handleKeyPressOBDet(e, OBDetquery, numImages, ObtDetMode, setOBDetResult, setSearchMode)
-
+          handleKeyPressOBDet(e, OBDetquery, numImages, ObtDetMode, setOBDetResult, setSearchMode);
         }}
-        onChange={(e) => {
-          autoResize(e);
-        }}>
+        onChange={autoResize}
+      >
         <Autocomplete
           getItemValue={(item) => item.name}
           items={getSuggestions(autocompleteValue)}
-          renderItem={(item, isHighlighted) =>
+          renderItem={(item, isHighlighted) => (
             <div
               key={item.id}
               className={`px-4 py-2 cursor-pointer ${isHighlighted ? 'bg-gray-200' : 'bg-white'}`}
             >
               {item.name}
             </div>
-          }
+          )}
           value={OBDetquery}
-          onChange={(e) => {
-            handleInputChange(e)
-            autoResize(e);
-          }}
-          onSelect={(val) => handleSelect(val)}
+          onChange={handleInputChange}
+          onSelect={handleSelect}
           inputProps={{
-            className: "shadow appearance-none border-2 rounded border-black w-96 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline",
+            className: "shadow appearance-none border-2 rounded border-black w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline",
             placeholder: "Enter queries like '2 person 1 car'",
           }}
           menuStyle={{
@@ -190,7 +177,6 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
           }}
         />
       </div>
-
     </div>
   );
 };

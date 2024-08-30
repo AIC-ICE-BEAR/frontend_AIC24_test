@@ -1,0 +1,82 @@
+[
+    {
+        "id": "red-dark",
+        "label": "Red Dark",
+        "color": "#aa0000"
+    },
+    {
+        "id": "red",
+        "label": "Red",
+        "color": "#ff0000"
+    },
+    {
+        "id": "orange",
+        "label": "Orange",
+        "color": "#ffaa00"
+    },
+    {
+        "id": "white",
+        "label": "White",
+        "color": "#ffffff"
+    },
+    {
+        "id": "green",
+        "label": "Green",
+        "color": "#00ff00"
+    },
+    {
+        "id": "teal",
+        "label": "Teal",
+        "color": "#00a76b"
+    },
+    {
+        "id": "cyan",
+        "label": "Cyan",
+        "color": "#00ffff"
+    },
+    {
+        "id": "blue-light",
+        "label": "Light Blue",
+        "color": "#0080ff"
+    },
+    {
+        "id": "blue",
+        "label": "Blue",
+        "color": "#0000ff"
+    },
+    {
+        "id": "purple",
+        "label": "Purple",
+        "color": "#7400aa"
+    },
+    {
+        "id": "black",
+        "label": "Black",
+        "color": "#000000"
+    },
+    {
+        "id": "grey",
+        "label": "Grey",
+        "color": "#7f7f7f"
+    },
+    {
+        "id": "olive",
+        "label": "Olive",
+        "color": "#555500"
+    },
+    {
+        "id": "brown",
+        "label": "Brown",
+        "color": "#953200"
+    },
+    {
+        "id": "pink",
+        "label": "Pink",
+        "color": "#c16570"
+    },
+    {
+        "id": "peach",
+        "label": "Peach",
+        "color": "#ffaa80"
+    }
+]

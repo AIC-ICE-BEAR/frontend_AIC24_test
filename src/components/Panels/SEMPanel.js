@@ -57,7 +57,9 @@ const SEMPanel = ({ numImages, setNumImages }) => {
   }, [ModelSelect, numImages]);
 
   const handleMuliQueryPress = (e, query) => {
-    handleKeyPressCLIP(e, query, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
+    // Clean the query before handling key press
+    const cleanedQuery = query.trim().replace(/\s+/g, ' ');
+    handleKeyPressCLIP(e, cleanedQuery, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
   };
 
   const addQueryBox = () => {
@@ -73,7 +75,7 @@ const SEMPanel = ({ numImages, setNumImages }) => {
   };
 
   return (
-    <div className="p-4 border-b">
+    <div className="p-4 border-b ">
       <div className="query-controls mb-5">
         <p>TEXT</p>
         <div className="flex justify-center gap-8">
@@ -112,7 +114,6 @@ const SEMPanel = ({ numImages, setNumImages }) => {
           <label>Vie</label>
         </div>
 
-
         {textquerylist.map((query, index) => (
           <div key={index} className="flex items-start gap-2 mb-2">
             <textarea
@@ -121,15 +122,16 @@ const SEMPanel = ({ numImages, setNumImages }) => {
               value={query}
               onChange={(e) => handleChangeMultiQuery(index, e.target.value)}
               onKeyPress={(e) => {
+                // Clean text before handling key press
+                const cleanedText = query.trim().replace(/\s+/g, ' ');
 
                 if (textquerylist.length > 1) {
-                  handleKeyPressFused(e, textquerylist, numImages, ModelSelect, setSearchResult, setSearchMode);
+                  handleKeyPressFused(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode);
                   setClipConfig(ModelSelect + "#" + numImages);
                 } else {
-                  handleKeyPressCLIP(e, Textquery, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
+                  handleKeyPressCLIP(e, cleanedText, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
                   setClipConfig(ModelSelect + "#" + numImages);
                 }
-
               }}
               rows="1"
               style={{ height: 'auto' }}

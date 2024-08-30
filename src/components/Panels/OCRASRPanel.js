@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Switch from "react-switch";
-import { handleKeyPressASR, handleKeyPressOCR } from "./ServicesUtils";
-import { useOCRSearchResult } from '../contexts/OCRsearchContext';
-import { useASRSearchResult } from '../contexts/ASRsearchContext';
-import { useModeContext } from '../contexts/searchModeContext';
+import { handleKeyPressASR, handleKeyPressOCR } from "../utils/ServicesUtils";
+import { useOCRSearchResult } from '../../contexts/OCRsearchContext';
+import { useASRSearchResult } from '../../contexts/ASRsearchContext';
+import { useModeContext } from '../../contexts/searchModeContext';
 
 const OCRASRPanel = ({ numImages, setNumImages }) => {
   const { setOCRResult } = useOCRSearchResult();
@@ -17,8 +17,8 @@ const OCRASRPanel = ({ numImages, setNumImages }) => {
 
   return (
     <div className="p-4 border-b">
-   
-      
+
+
       <div className="mb-5">
         <p>ASR</p>
         <div className=" flex items-center justify-center my-4 gap-2">

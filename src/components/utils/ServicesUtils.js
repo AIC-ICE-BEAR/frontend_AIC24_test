@@ -1,21 +1,23 @@
 // utils/requestHandlers.js
 import { toast } from 'react-toastify';
-import Clipservice from '../services/ClipService';  // Update paths as needed
-import OCRservice from '../services/OCRservice';
-import ASRservice from '../services/ASRservice';
-import OBDetservice from '../services/OBDetservice';
-import ImgSimiLarservice from '../services/ImageSimiService'
+import Clipservice from '../../services/ClipService';  // Update paths as needed
+import OCRservice from '../../services/OCRservice';
+import ASRservice from '../../services/ASRservice';
+import OBDetservice from '../../services/OBDetservice';
+import ImgSimiLarservice from '../../services/ImageSimiService'
+import fusedservice from '../../services/FusedSearchService'
 
 // handleKeyPressCLIP function
 export const handleKeyPressCLIP = async (e, Textquery, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode) => {
   if (e.key === 'Enter') {
     console.log("send request clip");
+    console.log("Num images", numImages)
 
     const toastId = toast.loading("Sending request...");
 
     try {
       const response = await Clipservice.sendClipRequest(Textquery, numImages, ModelSelect, QueryLanguage);
-      
+
       toast.update(toastId, {
         render: "Request successful!",
         type: 'success',
@@ -23,7 +25,7 @@ export const handleKeyPressCLIP = async (e, Textquery, numImages, ModelSelect, Q
         autoClose: 3000
       });
 
-      setSearchResult(response.data.search_result);
+      setSearchResult(response.data.results);
       setSearchMode('text');
     } catch (error) {
       console.log(error);
@@ -46,7 +48,7 @@ export const handleKeyPressOCR = async (e, OCRquery, numImages, setOCRResult, se
 
     try {
       const response = await OCRservice.sendOcrRequest(OCRquery, numImages);
-      
+
       toast.update(toastId, {
         render: "Request successful!",
         type: 'success',
@@ -78,7 +80,7 @@ export const handleKeyPressASR = async (e, ASRquery, ASRMode, numImages, setASRR
 
     try {
       const response = await ASRservice.sendASRRequest(ASRquery, ASRMode, numImages);
-      
+
       toast.update(toastId, {
         render: "Request successful!",
         type: 'success',
@@ -133,16 +135,52 @@ export const handleKeyPressOBDet = async (e, OBDetquery, numImages, ObtDetMode, 
 
 
 // image similarity function
-export const handleClickImgSim = async ( image, key_id, ClipConfig,  setImageSimiResult, setImageSimformVisible) => {
+export const handleClickImgSim = async (image, key_id, ClipConfig, setImageSimiResult, setImageSimformVisible) => {
 
-    const splits = ClipConfig.split("#"); 
-    const model = splits[0]
-    const numImages = parseInt(splits[1])
-  
+  const splits = ClipConfig.split("#");
+  const model = splits[0]
+  const numImages = parseInt(splits[1])
+
+  const toastId = toast.loading("Sending request...");
+  console.log("request", image, key_id, numImages, model)
+  try {
+    const response = await ImgSimiLarservice.sendImgSimiLarRequest(image, key_id, numImages, model);
+
+
+    toast.update(toastId, {
+      render: "Request successful!",
+      type: 'success',
+      isLoading: false,
+      autoClose: 3000
+    });
+
+    console.log("response image similariy", response.data.results);
+    setImageSimiResult(response.data.results)
+    setImageSimformVisible(true)
+  } catch (error) {
+    console.log(error);
+    toast.update(toastId, {
+      render: `Error: ${error.message || 'Failed'}`,
+      type: 'error',
+      isLoading: false,
+      autoClose: 3000
+    });
+  }
+
+};
+
+
+
+export const handleKeyPressFused = async (e, queries, numImages, ModelSelect, setSearchResult, setSearchMode) => {
+  if (e.key === 'Enter') {
+    console.log("send request Fused");
+    console.log("queries", queries)
+    console.log("Num images", numImages)
+
     const toastId = toast.loading("Sending request...");
-    console.log("request",image, key_id , numImages, model )
+
     try {
-      const response = await ImgSimiLarservice.sendImgSimiLarRequest( image, key_id, numImages, model);
+      const response = await fusedservice.sendFusedRequest(queries, numImages, ModelSelect);
 
       toast.update(toastId, {
         render: "Request successful!",
@@ -151,9 +189,8 @@ export const handleClickImgSim = async ( image, key_id, ClipConfig,  setImageSim
         autoClose: 3000
       });
 
-      console.log("response image similariy" , response.data.search_result);
-      setImageSimiResult(response.data.search_result)
-      setImageSimformVisible(true)
+      setSearchResult(response.data.results);
+      setSearchMode('text');
     } catch (error) {
       console.log(error);
       toast.update(toastId, {
@@ -163,5 +200,5 @@ export const handleClickImgSim = async ( image, key_id, ClipConfig,  setImageSim
         autoClose: 3000
       });
     }
-  
+  }
 };

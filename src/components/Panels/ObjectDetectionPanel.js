@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Autocomplete from 'react-autocomplete';
-import { handleKeyPressOBDet } from "./ServicesUtils";
-import { useOBDetResult } from '../contexts/OBDetsearchContext';
-import { useModeContext } from '../contexts/searchModeContext';
-import { useClipConfig } from '../contexts/ClipSearchConfigContext'
-import DroppableCanvas  from './Canvas'
+import { handleKeyPressOBDet } from "../utils/ServicesUtils";
+import { useOBDetResult } from '../../contexts/OBDetsearchContext';
+import { useModeContext } from '../../contexts/searchModeContext';
+import { useClipConfig } from '../../contexts/ClipSearchConfigContext'
+import DroppableCanvas from '../ObjectDet/Canvas'
 import Switch from "react-switch";
 
 
@@ -33,7 +33,7 @@ const DraggableIcon = ({ icon, onDragStart }) => {
 const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
   const { setOBDetResult } = useOBDetResult();
   const { setSearchMode } = useModeContext();
-  const { setClipConfig} = useClipConfig(); 
+  const { setClipConfig } = useClipConfig();
   const [OBDetquery, setOBDetquery] = useState('');
   const [autocompleteValue, setAutocompleteValue] = useState('');
   const [items, setitems] = useState([]); // Load items as before
@@ -86,7 +86,7 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
         setitems(data);
       })
       .catch((error) => console.error('Error loading items:', error));
-  }, []); 
+  }, []);
 
 
   const autoResize = (e) => {
@@ -127,70 +127,70 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
 
   return (
     <div className='mb-5'>
-        <h2 className="text-lg font-bold mb-4">Objects & Colors of the Scene</h2>
-        {/* Mode select */}
-        <div className="flex items-center justify-center my-4 gap-2">
-          <label>Slow</label>
-            <Switch onChange={handlemodeSwitch} checked={ismodeSwitchChecked} onColor={'#888'} offColor={'#888'} uncheckedIcon={false} checkedIcon={true} height={20} width={53} />
-          <label>Fast</label>
+      <h2 className="text-lg font-bold mb-4">Objects & Colors of the Scene</h2>
+      {/* Mode select */}
+      <div className="flex items-center justify-center my-4 gap-2">
+        <label>Slow</label>
+        <Switch onChange={handlemodeSwitch} checked={ismodeSwitchChecked} onColor={'#888'} offColor={'#888'} uncheckedIcon={false} checkedIcon={true} height={20} width={53} />
+        <label>Fast</label>
+      </div>
+
+      {/* OB detection Query text box */}
+
+
+
+      <div className="flex flex-col items-center">
+
+
+        <div className="flex flex-wrap justify-center mb-4">
+          {icons.map((icon) => (
+            <DraggableIcon key={icon.id} icon={icon} onDragStart={handleDragStart} />
+          ))}
         </div>
 
-        {/* OB detection Query text box */}
-        
+        <DroppableCanvas
+          droppedItems={droppedItems}
+          handleDrop={handleDrop}
+          handleDelete={handleDelete}
+        />
+      </div>
 
 
-        <div className="flex flex-col items-center">
-          
+      <div className=" text-mode-options pt-5"
+        onKeyPress={(e) => {
+          handleKeyPressOBDet(e, OBDetquery, numImages, ObtDetMode, setOBDetResult, setSearchMode)
 
-          <div className="flex flex-wrap justify-center mb-4">
-            {icons.map((icon) => (
-              <DraggableIcon key={icon.id} icon={icon} onDragStart={handleDragStart} />
-            ))}
-          </div>
+        }}
+        onChange={(e) => {
+          autoResize(e);
+        }}>
+        <Autocomplete
+          getItemValue={(item) => item.name}
+          items={getSuggestions(autocompleteValue)}
+          renderItem={(item, isHighlighted) =>
+            <div
+              key={item.id}
+              className={`px-4 py-2 cursor-pointer ${isHighlighted ? 'bg-gray-200' : 'bg-white'}`}
+            >
+              {item.name}
+            </div>
+          }
+          value={OBDetquery}
+          onChange={(e) => {
+            handleInputChange(e)
+            autoResize(e);
+          }}
+          onSelect={(val) => handleSelect(val)}
+          inputProps={{
+            className: "shadow appearance-none border-2 rounded border-black w-96 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline",
+            placeholder: "Enter queries like '2 person 1 car'",
+          }}
+          menuStyle={{
+            className: 'absolute left-0 right-0 bg-white shadow-lg max-h-10 overflow-y-auto z-10 rounded-lg border border-gray-200',
+          }}
+        />
+      </div>
 
-          <DroppableCanvas
-            droppedItems={droppedItems}
-            handleDrop={handleDrop}
-            handleDelete={handleDelete}
-          />
-        </div>
-
-
-        <div className=" text-mode-options pt-5" 
-             onKeyPress={(e) => {
-              handleKeyPressOBDet(e, OBDetquery, numImages, ObtDetMode, setOBDetResult, setSearchMode)
-            
-             }}
-             onChange={(e) => {
-              autoResize(e);
-            }}>
-          <Autocomplete
-              getItemValue={(item) => item.name}
-              items={getSuggestions(autocompleteValue)}
-              renderItem={(item, isHighlighted) =>
-                <div 
-                  key={item.id} 
-                  className={`px-4 py-2 cursor-pointer ${isHighlighted ? 'bg-gray-200' : 'bg-white'}`}
-                >
-                  {item.name}
-                </div>
-              }
-              value={OBDetquery}
-              onChange={(e) => {
-                handleInputChange(e)
-                autoResize(e);
-              }}
-              onSelect={(val) => handleSelect(val)}
-              inputProps={{
-                className: "shadow appearance-none border-2 rounded border-black w-96 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline",
-                placeholder: "Enter queries like '2 person 1 car'",
-              }}
-              menuStyle={{
-                className: 'absolute left-0 right-0 bg-white shadow-lg max-h-10 overflow-y-auto z-10 rounded-lg border border-gray-200',
-              }}
-            />
-        </div>
-        
     </div>
   );
 };

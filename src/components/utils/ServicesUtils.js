@@ -6,6 +6,7 @@ import ASRservice from '../../services/ASRservice';
 import OBDetservice from '../../services/OBDetservice';
 import ImgSimiLarservice from '../../services/ImageSimiService'
 import fusedservice from '../../services/FusedSearchService'
+import ObjectColorservice from '../../services/ObjectColorService'
 
 // handleKeyPressCLIP function
 export const handleKeyPressCLIP = async (e, Textquery, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode) => {
@@ -56,7 +57,7 @@ export const handleKeyPressOCR = async (e, OCRquery, numImages, setOCRResult, se
         autoClose: 3000
       });
 
-      setOCRResult(response.data.search_result);
+      setOCRResult(response.data.results);
       setSearchMode('text');
     } catch (error) {
       console.log(error);
@@ -88,7 +89,7 @@ export const handleKeyPressASR = async (e, ASRquery, ASRMode, numImages, setASRR
         autoClose: 3000
       });
 
-      setASRResult(response.data.search_result);
+      setASRResult(response.data.results);
       setSearchMode('asr');
     } catch (error) {
       console.log(error);
@@ -119,7 +120,7 @@ export const handleKeyPressOBDet = async (e, OBDetquery, numImages, ObtDetMode, 
         autoClose: 3000
       });
 
-      setOBDetResult(response.data.search_result);
+      setOBDetResult(response.data.results);
       setSearchMode('text');
     } catch (error) {
       console.log(error);
@@ -132,6 +133,41 @@ export const handleKeyPressOBDet = async (e, OBDetquery, numImages, ObtDetMode, 
     }
   }
 };
+
+
+// handleKeyPressOBDet function
+export const handleKeyPressOBJCOLOR = async (e, droppedItems, numImages, setOBDetResult, setSearchMode) => {
+  if (e.key === 'Enter') {
+    console.log("send request OBdet");
+
+    const toastId = toast.loading("Sending request...");
+    console.log("dropped items", { 'Items': droppedItems, 'k': numImages })
+
+    // try {
+    //   const response = await ObjectColorservice.sendObjectColorRequest(OBDetquery, numImages);
+
+    //   toast.update(toastId, {
+    //     render: "Request successful!",
+    //     type: 'success',
+    //     isLoading: false,
+    //     autoClose: 3000
+    //   });
+
+    //   setOBDetResult(response.data.results);
+    //   setSearchMode('text');
+    // } catch (error) {
+    //   console.log(error);
+    //   toast.update(toastId, {
+    //     render: `Error: ${error.message || 'Failed'}`,
+    //     type: 'error',
+    //     isLoading: false,
+    //     autoClose: 3000
+    //   });
+    // }
+  }
+};
+
+
 
 
 // image similarity function

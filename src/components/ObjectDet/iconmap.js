@@ -1,0 +1,196 @@
+import {
+    FaUser,
+    FaBicycle,
+    FaCar,
+    FaMotorcycle,
+    FaPlane,
+    FaBus,
+
+    FaTruck,
+    FaShip,
+    FaTrafficLight,
+    FaFireExtinguisher,
+
+    FaParking,
+    FaCrow,
+    FaCat,
+    FaDog,
+    FaHorse,
+
+    FaPaw,
+    FaHorseHead,
+
+    FaSchool,
+    FaUmbrella,
+    FaShoppingBag,
+    FaUserTie,
+    FaSuitcase,
+    FaCompactDisc,
+    FaSkiing,
+    FaSnowboarding,
+    FaBasketballBall,
+    FaParachuteBox,
+
+    FaHandPaper,
+    FaSkating,
+
+    FaTableTennis,
+    FaBeer,
+    FaGlassCheers,
+    FaMugHot,
+    FaUtensilSpoon,
+    FaUtensils,
+    FaCogs,
+    FaDrumstickBite,
+    FaAppleAlt,
+    FaBreadSlice,
+    FaLemon,
+    FaCarrot,
+    FaHotdog,
+    FaPizzaSlice,
+    FaCookie,
+    FaBirthdayCake,
+    FaCouch,
+    FaLeaf,
+    FaBed,
+    FaChair,
+    FaToilet,
+    FaLaptop,
+    FaMouse,
+    FaTv,
+    FaKeyboard,
+    FaMobileAlt,
+
+
+    FaToiletPaper,
+    FaSink,
+    FaTable,
+    FaBook,
+    FaClock,
+
+    FaCut,
+
+
+    FaTooth,
+} from "react-icons/fa";
+
+import { IoMdTrain } from "react-icons/io";
+import { FaBaseballBatBall } from "react-icons/fa6";
+import {
+    PiOvenFill,
+    PiKnifeBold
+} from "react-icons/pi";
+import {
+    TbMicrowaveFilled,
+    TbGrillFork
+} from "react-icons/tb";
+import {
+    GiSheep,
+    GiCow,
+    GiElephant,
+    GiSurfBoard,
+    GiComb,
+    GiPorcelainVase,
+    GiTvRemote,
+    GiOrangeSlice,
+    GiToothbrush,
+    GiToaster,
+    GiBananaPeeled,
+    GiWaterBottle,
+    GiBearFace,
+    GiKite,
+    GiParkBench
+} from "react-icons/gi";
+import {
+    RiBearSmileFill,
+    RiFridgeFill
+} from "react-icons/ri";
+import { BsSignStopFill } from "react-icons/bs";
+import { TbBowl } from "react-icons/tb";
+import { PiPottedPlantFill } from "react-icons/pi";
+
+const iconSize = 20;
+const iconMap = {
+    person: <FaUser size={iconSize} />,
+    bicycle: <FaBicycle size={iconSize} />,
+    car: <FaCar size={iconSize} />,
+    motorcycle: <FaMotorcycle size={iconSize} />,
+    airplane: <FaPlane size={iconSize} />,
+    bus: <FaBus size={iconSize} />,
+    train: <IoMdTrain size={iconSize} />,
+    truck: <FaTruck size={iconSize} />,
+    boat: <FaShip size={iconSize} />,
+    traffic_light: <FaTrafficLight size={iconSize} />,
+    fire_hydrant: <FaFireExtinguisher size={iconSize} />,
+    stop_sign: <BsSignStopFill size={iconSize} />,
+    parking_meter: <FaParking size={iconSize} />,
+    bench: <GiParkBench size={iconSize} />,
+    bird: <FaCrow size={iconSize} />,
+    cat: <FaCat size={iconSize} />,
+    dog: <FaDog size={iconSize} />,
+    horse: <FaHorse size={iconSize} />,
+    sheep: <GiSheep size={iconSize} />,
+    cow: <GiCow size={iconSize} />,
+    elephant: <GiElephant size={iconSize} />,
+    bear: <GiBearFace size={iconSize} />,
+    zebra: <FaHorseHead size={iconSize} />,
+
+    backpack: <FaSchool size={iconSize} />,
+    umbrella: <FaUmbrella size={iconSize} />,
+    handbag: <FaShoppingBag size={iconSize} />,
+    tie: <FaUserTie size={iconSize} />,
+    suitcase: <FaSuitcase size={iconSize} />,
+    frisbee: <FaCompactDisc size={iconSize} />,
+    skis: <FaSkiing size={iconSize} />,
+    snowboard: <FaSnowboarding size={iconSize} />,
+    sports_ball: <FaBasketballBall size={iconSize} />,
+    kite: <GiKite size={iconSize} />,
+    baseball_bat: <FaBaseballBatBall size={iconSize} />,
+    baseball_glove: <FaHandPaper size={iconSize} />,
+    skateboard: <FaSkating size={iconSize} />,
+    surfboard: <GiSurfBoard size={iconSize} />,
+    tennis_racket: <FaTableTennis size={iconSize} />,
+    bottle: <GiWaterBottle size={iconSize} />,
+    wine_glass: <FaGlassCheers size={iconSize} />,
+    cup: <FaMugHot size={iconSize} />,
+    fork: <TbGrillFork size={iconSize} />,
+    knife: < PiKnifeBold size={iconSize} />,
+    spoon: <FaUtensilSpoon size={iconSize} />,
+    bowl: <TbBowl size={iconSize} />,
+    banana: <GiBananaPeeled size={iconSize} />,
+    apple: <FaAppleAlt size={iconSize} />,
+    sandwich: <FaBreadSlice size={iconSize} />,
+    orange: <GiOrangeSlice size={iconSize} />,
+    broccoli: <FaLeaf size={iconSize} />,
+    carrot: <FaCarrot size={iconSize} />,
+    hot_dog: <FaHotdog size={iconSize} />,
+    pizza: <FaPizzaSlice size={iconSize} />,
+    donut: <FaCookie size={iconSize} />,
+    cake: <FaBirthdayCake size={iconSize} />,
+    chair: <FaChair size={iconSize} />,
+    couch: <FaCouch size={iconSize} />,
+    potted_plant: <PiPottedPlantFill size={iconSize} />,
+    bed: <FaBed size={iconSize} />,
+    dining_table: <FaChair size={iconSize} />,
+    toilet: <FaToilet size={iconSize} />,
+    tv: <FaTv size={iconSize} />,
+    laptop: <FaLaptop size={iconSize} />,
+    mouse: <FaMouse size={iconSize} />,
+    remote: <GiTvRemote size={iconSize} />,
+    keyboard: <FaKeyboard size={iconSize} />,
+    cell_phone: <FaMobileAlt size={iconSize} />,
+    microwave: <TbMicrowaveFilled size={iconSize} />,
+    oven: <PiOvenFill size={iconSize} />,
+    toaster: <GiToaster size={iconSize} />,
+    sink: <FaSink size={iconSize} />,
+    refrigerator: <RiFridgeFill size={iconSize} />,
+    book: <FaBook size={iconSize} />,
+    clock: <FaClock size={iconSize} />,
+    vase: <GiPorcelainVase size={iconSize} />,
+    scissors: <FaCut size={iconSize} />,
+    teddy_bear: <RiBearSmileFill size={iconSize} />,
+    hair_drier: <GiComb size={iconSize} />,
+    toothbrush: <GiToothbrush size={iconSize} />,
+};
+
+export default iconMap;

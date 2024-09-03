@@ -10,13 +10,13 @@ class OBDetService {
   async sendOBDetRequest(query, numImages, ObtDetMode) {
     try {
       console.log({
-        "query": [query],
+        "query": query,
         "k": numImages,
         "mode": ObtDetMode
       })
 
       const response = await this.axiosInstance.post('/search_ObjectCount', {
-        "query": [query],
+        "query": query,
         "topk": numImages,
         "mode": ObtDetMode
       });

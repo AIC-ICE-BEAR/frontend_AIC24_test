@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import iconMap from './iconmap';
 
 
 // DraggableIcon component
@@ -9,8 +10,7 @@ export const DraggableIcon = ({ icon, onDragStart }) => {
       onDragStart={(e) => onDragStart(e, icon)}
       className="flex flex-col items-center justify-center cursor-pointer w-6 h-6" // Tailwind classes to center content
     >
-      <img src={icon.src} alt={icon.label} className="h-6 w-6 pointer-events-none" /> {/* Prevent clicks on the image itself */}
-
+      {iconMap[icon.label]}
     </div>
   );
 };
@@ -32,7 +32,8 @@ export const DraggableColor = ({ icon, onDragStart }) => {
 
 
 
-const DroppableCanvas = ({ droppedItems, handleDrop, handleDelete }) => {
+
+const DroppableCanvas = ({ droppedItems, handleDrop, handleDelete, onKeyPressFunction }) => {
   const [width, setWidth] = useState(300);
   const [height, setHeight] = useState(200);
   const rows = 10;  // Number of rows in the grid
@@ -41,8 +42,10 @@ const DroppableCanvas = ({ droppedItems, handleDrop, handleDelete }) => {
   return (
     <div className="flex flex-col items-center">
       <div
+        onKeyPress={(e) => onKeyPressFunction(e, droppedItems)}
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
+        tabIndex={0} // Make the canvas focusable to capture keypress events
         className="relative border-4 border-black"
         style={{
           width: `${width}px`,  // Dynamically set width
@@ -80,7 +83,9 @@ const DroppableCanvas = ({ droppedItems, handleDrop, handleDelete }) => {
 
             {/* Render based on item type */}
             {item.src ? (
-              <img src={item.src} alt={item.label} className="h-10 w-10" />
+              <div className='item-center'>
+                {iconMap[item.src]}
+              </div>
             ) : item.color ? (
               <div
                 className="h-10 w-10"
@@ -97,3 +102,5 @@ const DroppableCanvas = ({ droppedItems, handleDrop, handleDelete }) => {
 };
 
 export default DroppableCanvas;
+
+

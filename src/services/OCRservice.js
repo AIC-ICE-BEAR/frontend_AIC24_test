@@ -9,9 +9,10 @@ class OcrService {
 
 
   async sendOcrRequest(query, numImages) {
+    console.log("Request", query, numImages)
     try {
       const response = await this.axiosInstance.post('/search_OCR', {
-        "query": [query],
+        "query": query,
         "topk": numImages
       });
 

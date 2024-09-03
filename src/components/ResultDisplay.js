@@ -288,7 +288,7 @@ function DisplayResult({ style }) {
                           src={'./imgSim.png'}
                           onClick={() => {
 
-                            handleClickImgSim(item.video_name, item.keyframe_id, ClipConfig, setImageSimiResult, setImageSimformVisible)
+                            handleClickImgSim(item.video_name, key_id, ClipConfig, setImageSimiResult, setImageSimformVisible)
                           }}
                           alt="img-sim">
 

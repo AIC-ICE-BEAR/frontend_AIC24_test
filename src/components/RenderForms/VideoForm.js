@@ -16,8 +16,8 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
     if (videoUrl) {
       mapKeyframe(videoUrl, frame_idx)
         .then(result => {
-          console.log("Video start", videoUrl, result.frameIdx / videoSpeed)
-          setStartTime(result.frameIdx / videoSpeed);
+          console.log("Video start", videoUrl, result.frameIdx / result.videoSpeed)
+          setStartTime(result.frameIdx / result.videoSpeed);
         })
         .catch(error => {
           console.error(error);

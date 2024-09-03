@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Autocomplete from 'react-autocomplete';
-import { handleKeyPressOBDet } from "../utils/ServicesUtils";
+import { handleKeyPressOBDet, handleKeyPressOBJCOLOR } from "../utils/ServicesUtils";
 import { useOBDetResult } from '../../contexts/OBDetsearchContext';
 import { useModeContext } from '../../contexts/searchModeContext';
 import { useClipConfig } from '../../contexts/ClipSearchConfigContext';
@@ -35,7 +35,8 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
         const createdIcons = data.map(item => ({
           id: item.id.toString(),
           label: item.name,
-          src: `path_to_icons/${item.name}.png`
+          src: item.name
+
         }));
         setIcons(createdIcons);
       })
@@ -44,7 +45,7 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
 
 
   useEffect(() => {
-    fetch('/color_palletes.json') // Replace with the correct path
+    fetch('/color_palletes.json')
       .then((response) => response.json())
       .then((data) => {
         setcolors(data);
@@ -115,6 +116,12 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
     return items.filter(item => item.name.includes(input));
   };
 
+  const handleCanvasKeyPress = (e, droppedItems) => {
+    if (e.key === 'Enter') {
+      console.log("Dropped items", droppedItems)
+    }
+  };
+
   return (
     <div className='w-full h-full mb-5 items-center'>
       <h2 className="text-lg font-bold mb-4">Objects & Colors of the Scene</h2>
@@ -133,12 +140,15 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
           ))}
         </div>
 
-
-        <DroppableCanvas
-          droppedItems={droppedItems}
-          handleDrop={handleDrop}
-          handleDelete={handleDelete}
-        />
+        <div>
+          <DroppableCanvas
+            droppedItems={droppedItems}
+            handleDrop={handleDrop}
+            handleDelete={handleDelete}
+            onKeyPressFunction={handleCanvasKeyPress} // Add keypress event to the canvas
+            tabIndex={0} // Make the canvas focusable to capture keypress events
+          />
+        </div>
       </div>
 
       {/* Autocomplete and other elements remain unchanged */}

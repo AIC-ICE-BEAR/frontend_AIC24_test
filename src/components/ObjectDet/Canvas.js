@@ -4,16 +4,26 @@ import iconMap from './iconmap';
 
 // DraggableIcon component
 export const DraggableIcon = ({ icon, onDragStart }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <div
       draggable
       onDragStart={(e) => onDragStart(e, icon)}
-      className="flex flex-col items-center justify-center cursor-pointer w-6 h-6" // Tailwind classes to center content
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative flex flex-col items-center justify-center cursor-pointer w-6 h-6" // Added relative for positioning
     >
       {iconMap[icon.label]}
+      {isHovered && (
+        <span className="absolute -bottom-2 -right-2 transform translate-x-1/2 translate-y-1/2 bg-black text-white text-xs px-1 py-0.5 rounded shadow-lg">
+          {icon.label}
+        </span>
+      )}
     </div>
   );
 };
+
 
 
 export const DraggableColor = ({ icon, onDragStart }) => {

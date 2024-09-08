@@ -10,7 +10,8 @@ import { handleClickImgSim } from './utils/ServicesUtils'
 import renderNextImagesForm from './RenderForms/NextImages'
 import renderImagesSimilarityForm from './RenderForms/ImgSimilarity'
 import { VideoModal } from './RenderForms/VideoForm'
-import { mapKeyframe } from './utils/utils'
+import { mapKeyframe, createCSV } from './utils/utils'
+
 
 
 function DisplayResult({ style }) {
@@ -204,7 +205,30 @@ function DisplayResult({ style }) {
             {renderImagesSimilarityForm(ImageSimiResult, setImageSimformVisible, selectedImage, handleImageClick, handleDoubleClick, handleClickImgSim, ClipConfig, setImageSimiResult, handlePlayVideoClick)}
           </div>
         )}
-        <label>Result</label>
+        <div className="flex flex-col">
+          <label className='justify-center'>Result</label>
+          <div className="flex justify-end">
+            <button className="p-4 py-1 bg-gray-300 text-black border-black border-2 rounded"
+              onClick={() => {
+                if (displayResult.length === 0) {
+                  console.log("displayResult not found")
+                }
+                else {
+                  if (searchMode === "asr") {
+                    console.log("Not the correct mode")
+                  }
+                  else {
+                    createCSV(displayResult)
+                  }
+
+                }
+
+              }}>
+              Create CSV
+            </button>
+          </div>
+        </div>
+
 
         {/* For CLIP search,  OCR and Object Detection */}
         {displayResult && searchMode === 'text' && (

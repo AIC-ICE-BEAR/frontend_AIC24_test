@@ -5,6 +5,7 @@ import SEMPanel from './Panels/SEMPanel';
 import OCRPanel from './Panels/OCRPanel';
 import ASRPanel from './Panels/ASRPanel';
 import VQAPanel from './Panels/VQAPanel';
+import TemporalPanel from './Panels/TemporalPanel'
 import ObjectDetectionPanel from './Panels/ObjectDetectionPanel';
 
 const SidebarApp = () => {
@@ -15,6 +16,8 @@ const SidebarApp = () => {
     switch (activePanel) {
       case 'SEM':
         return <SEMPanel numImages={numImages} setNumImages={setNumImages} />;
+      case 'TEMP':
+        return <TemporalPanel numImages={numImages} setNumImages={setNumImages} />;
       case 'OCRASR':
         return <OCRPanel numImages={numImages} setNumImages={setNumImages} />;
       case 'ASR':
@@ -43,6 +46,16 @@ const SidebarApp = () => {
               src={'./imgsearch.png'}>
             </img>
           </button>
+
+          <button
+            className={`w-full p-2 text-center rounded ${activePanel === 'TEMP' ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+            onClick={() => setActivePanel('TEMP')}
+          >
+            <img className="w-8 p-0.5 rounded-md"
+              src={'./temporalSearch.png'}>
+            </img>
+          </button>
+
           <button
             className={`w-full p-2 text-center rounded ${activePanel === 'OCRASR' ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
             onClick={() => setActivePanel('OCRASR')}

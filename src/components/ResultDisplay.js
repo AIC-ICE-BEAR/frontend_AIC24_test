@@ -1,25 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchResult } from '../contexts/ClipsearchContext';
+import { useTemporalSearchResult } from '../contexts/TemporalSearchContext'
 import { useOCRSearchResult } from '../contexts/OCRsearchContext';
 import { useOBDetResult } from '../contexts/OBDetsearchContext';
+import { useVQASearchImage } from '../contexts/VQAImageContext'
 import { useASRSearchResult } from '../contexts/ASRsearchContext';
 import { useModeContext } from '../contexts/searchModeContext';
 import { useClipConfig } from '../contexts/ClipSearchConfigContext';
+import { useVQASearchResult } from '../contexts/VQAContext';
 import { useSubmitContext } from '../contexts/SubmitImageContext';
 import { handleClickImgSim } from './utils/ServicesUtils'
 import renderNextImagesForm from './RenderForms/NextImages'
 import renderImagesSimilarityForm from './RenderForms/ImgSimilarity'
 import { VideoModal } from './RenderForms/VideoForm'
 import { mapKeyframe, createCSV } from './utils/utils'
-
+import { toast } from 'react-toastify';
 
 
 function DisplayResult({ style }) {
   // Load results from context
+  const { VQAResult } = useVQASearchResult();
   const { searchResult } = useSearchResult();
+  const { TemporalResult } = useTemporalSearchResult();
   const { OBDetResult } = useOBDetResult();
   const { OCRResult } = useOCRSearchResult();
   const { ASRResult } = useASRSearchResult();
+  const { VQAImage, setVQAImage } = useVQASearchImage();
   // Display result 
 
   const [displayResult, setdisplayResult] = useState([]);
@@ -62,11 +68,24 @@ function DisplayResult({ style }) {
   }, [displayResult]);
 
 
+
   useEffect(() => {
 
     setdisplayResult(searchResult);
 
   }, [searchResult]);
+
+  useEffect(() => {
+
+    setdisplayResult(VQAResult);
+
+  }, [VQAResult]);
+
+  useEffect(() => {
+
+    setdisplayResult(TemporalResult);
+
+  }, [TemporalResult]);
 
   useEffect(() => {
 
@@ -149,6 +168,17 @@ function DisplayResult({ style }) {
   };
 
 
+  const handleVQAClick = (vid_name, keyframe) => {
+    const image_value = {
+      video_name: vid_name,
+      keyframe: keyframe
+    }
+
+    console.log("sent to VQA image context", image_value)
+    setVQAImage([...VQAImage, image_value])
+  };
+
+
 
   const submitSelectedImage = async () => {
     const splits = selectedImage.split('-')
@@ -175,14 +205,6 @@ function DisplayResult({ style }) {
     setSelectedVideo({ video_name, frame_idx });
     setwatchVideoformVisible(true);
   };
-
-
-
-
-
-
-
-
 
   return (
     <div className="block w-screen" style={style}>
@@ -220,9 +242,7 @@ function DisplayResult({ style }) {
                   else {
                     createCSV(displayResult)
                   }
-
                 }
-
               }}>
               Create CSV
             </button>
@@ -278,6 +298,20 @@ function DisplayResult({ style }) {
 
                     </img>
 
+                    <img className="w-8 p-0.5 rounded-md  hover:bg-black"
+
+                      src={'./VQA.jpg'}
+
+                      onClick={() => {
+
+                        handleVQAClick(item.video_name, item.keyframe_id)
+                      }}
+                      alt="vid-watch">
+
+                    </img>
+
+
+
                   </div>
 
 
@@ -290,6 +324,85 @@ function DisplayResult({ style }) {
             </div>
           </div>
         )}
+
+
+        {/* For Temporal Search */}
+        {displayResult && searchMode === 'temporal' && (
+          <div className="overflow-y-auto h-screen" ref={scrollContainerRef}>
+            <div className="grid grid-cols-2 gap-2">
+              {displayResult.map((item, index) => (
+                <div key={index} className="border p-2 bg-white border-black">
+                  <div className="grid grid-cols-2 flex-row gap-2 ">
+                    {item.matched_frames.map((frameId, index) => (
+                      <div>
+                        <span> Query {index + 1} </span>
+                        <div
+                          key={index}
+                          className={`border p-1 bg-white ${selectedImage === `${item.video_name}-${frameId}` ? 'border-4 border-red-500' : 'border-gray-300'}`}
+                        >
+                          <img
+                            src={`${process.env.REACT_APP_IMAGE_PATH}/${item.video_name}/${frameId}.jpg`}
+                            className="w-full h-auto"
+                            alt={frameId}
+                            onClick={() => handleImageClick(item.video_name, frameId)}
+                            onDoubleClick={() => handleDoubleClick(item.video_name, frameId)}
+
+                          />
+
+                          <div className='flex'>
+                            <img className="w-8 p-0.5 rounded-md  hover:bg-black"
+                              src={'./imgSim.png'}
+                              onClick={() => {
+                                handleClickImgSim(item.video_name, frameId, ClipConfig, setImageSimiResult, setImageSimformVisible)
+                              }}
+                              alt="img-sim"></img>
+
+                            <img className="w-8 p-0.5 rounded-md  hover:bg-black"
+                              src={'./play_button.jpg'}
+                              onClick={() => {
+
+                                handlePlayVideoClick(item.video_name, frameId)
+                              }}
+                              alt="vid-watch">
+
+                            </img>
+
+                            <img className="w-8 p-0.5 rounded-md  hover:bg-black"
+
+                              src={'./image_icon.jpg'}
+
+                              onClick={() => {
+
+                                handleDoubleClick(item.video_name, frameId)
+                              }}
+                              alt="vid-watch">
+
+                            </img>
+
+                          </div>
+
+
+
+
+                          {item.video_name} {frameId}.jpg
+
+                        </div>
+
+
+                        <span>{frameId} </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-2 text-center">
+                    <span>{item.video_name} </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+
 
         {/* For ASR search */}
         {displayResult && searchMode === 'asr' && (
@@ -358,6 +471,8 @@ function DisplayResult({ style }) {
             ))}
           </div>
         )}
+
+
       </div>
     </div>
   );

@@ -42,14 +42,14 @@ export const handleKeyPressCLIP = async (e, Textquery, numImages, ModelSelect, Q
 };
 
 // handleKeyPressOCR function
-export const handleKeyPressOCR = async (e, OCRquery, numImages, setOCRResult, setSearchMode) => {
+export const handleKeyPressOCR = async (e, OCRquery, numImages, OCRMode, setOCRResult, setSearchMode) => {
   if (e.key === 'Enter') {
     console.log("send request OCR");
 
     const toastId = toast.loading("Sending request...");
 
     try {
-      const response = await OCRservice.sendOcrRequest(OCRquery, numImages);
+      const response = await OCRservice.sendOcrRequest(OCRquery, numImages, OCRMode);
 
       toast.update(toastId, {
         render: "Request successful!",
@@ -257,7 +257,7 @@ export const handleKeyPressTemporal = async (e, queries, numImages, match_first,
       });
 
       setSearchResult(response.data.results);
-      setSearchMode('text');
+      setSearchMode('temporal');
     } catch (error) {
       console.log(error);
       toast.update(toastId, {

@@ -5,7 +5,7 @@ import { mapKeyframe } from '../utils/utils';
 // VideoPlayer Component
 const VideoPlayer = ({ videoUrl, frame_idx }) => {
   const videoRef = useRef(null);
-  const videoSpeed = 25;
+  const videoSpeed = 30;
   const [startTime, setStartTime] = useState(0);
 
   // Fetch the start time from keyframe mapping

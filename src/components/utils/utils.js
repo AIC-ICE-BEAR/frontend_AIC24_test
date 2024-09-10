@@ -21,7 +21,7 @@ export const mapKeyframe = async (videoName, keyFrameId) => {
           complete: (result) => {
             const data = result.data;
 
-            const keyFrameIndex = keyFrameId - 1; // Convert to zero-indexed
+            const keyFrameIndex = keyFrameId; // Convert to zero-indexed
 
 
             if (keyFrameIndex >= 0 && keyFrameIndex < data.length) {

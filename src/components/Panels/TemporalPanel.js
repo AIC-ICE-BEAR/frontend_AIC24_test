@@ -4,11 +4,13 @@ import { handleKeyPressTemporal } from "../utils/ServicesUtils";
 import { useSearchResult } from '../../contexts/ClipsearchContext';
 import { useModeContext } from '../../contexts/searchModeContext';
 import { useClipConfig } from '../../contexts/ClipSearchConfigContext';
+import { useTemporalSearchResult } from '../../contexts/TemporalSearchContext'
 
 const TemporalPanel = ({ numImages, setNumImages }) => {
     const { setSearchResult } = useSearchResult();
     const { setSearchMode } = useModeContext();
     const { ClipConfig, setClipConfig } = useClipConfig();
+    const { TemporalResult, setTemporalResult } = useTemporalSearchResult();
 
     const [ModelSelect, setModelSelect] = useState('ViT-bigG-2B');
     const [Textquery, setTextquery] = useState('');
@@ -125,7 +127,7 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                                 const cleanedText = query.trim().replace(/\s+/g, ' ');
 
 
-                                handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMode, ModelSelect, setSearchResult, setSearchMode);
+                                handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMode, ModelSelect, setTemporalResult, setSearchMode);
                                 setClipConfig(ModelSelect + "#" + numImages);
 
                             }}

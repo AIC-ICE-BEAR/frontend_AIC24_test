@@ -7,6 +7,7 @@ import OBDetservice from '../../services/OBDetservice';
 import ImgSimiLarservice from '../../services/ImageSimiService'
 import fusedservice from '../../services/FusedSearchService'
 import ObjectColorservice from '../../services/ObjectColorService'
+import temporalservice from '../../services/TemporalService'
 
 // handleKeyPressCLIP function
 export const handleKeyPressCLIP = async (e, Textquery, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode) => {
@@ -217,6 +218,36 @@ export const handleKeyPressFused = async (e, queries, numImages, ModelSelect, se
 
     try {
       const response = await fusedservice.sendFusedRequest(queries, numImages, ModelSelect);
+
+      toast.update(toastId, {
+        render: "Request successful!",
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+      setSearchResult(response.data.results);
+      setSearchMode('text');
+    } catch (error) {
+      console.log(error);
+      toast.update(toastId, {
+        render: `Error: ${error.message || 'Failed'}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+    }
+  }
+};
+
+export const handleKeyPressTemporal = async (e, queries, numImages, match_first, ModelSelect, setSearchResult, setSearchMode) => {
+  if (e.key === 'Enter') {
+
+
+    const toastId = toast.loading("Sending request...");
+
+    try {
+      const response = await temporalservice.sendTemporalRequest(queries, numImages, match_first, ModelSelect);
 
       toast.update(toastId, {
         render: "Request successful!",

@@ -17,7 +17,7 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
   const [OBDetquery, setOBDetquery] = useState('');
   const [autocompleteValue, setAutocompleteValue] = useState('');
   const [items, setItems] = useState([]); // Items from JSON
-  const [ObtDetMode, setObtDetMode] = useState('slow');
+  const [ObtDetMode, setObtDetMode] = useState('elastic');
   const [ismodeSwitchChecked, setismodeSwitchChecked] = useState(false);
   const [droppedItems, setDroppedItems] = useState([]);
   const [icons, setIcons] = useState([]);
@@ -89,7 +89,7 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
 
   const handlemodeSwitch = (checked) => {
     setismodeSwitchChecked(checked);
-    setObtDetMode(checked ? "fast" : "slow");
+    setObtDetMode(checked ? "fast" : "elastic");
   };
 
   const handleInputChange = (e) => {
@@ -153,7 +153,7 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
 
       {/* Autocomplete and other elements remain unchanged */}
       <div className="flex items-center justify-center my-4 gap-2">
-        <label>slow</label>
+        <label>elastic</label>
         <Switch onChange={handlemodeSwitch} checked={ismodeSwitchChecked} />
         <label>fast</label>
       </div>

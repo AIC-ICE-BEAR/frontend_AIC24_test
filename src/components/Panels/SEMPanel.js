@@ -11,7 +11,7 @@ const SEMPanel = ({ numImages, setNumImages }) => {
   const { setSearchMode } = useModeContext();
   const { ClipConfig, setClipConfig } = useClipConfig();
 
-  const [ModelSelect, setModelSelect] = useState('ViT-bigG-14');
+  const [ModelSelect, setModelSelect] = useState('ViT-bigG-2B');
   const [Textquery, setTextquery] = useState('');
   const [textquerylist, settextquerylist] = useState(['']); // Initialize with primary Textquery
   const [QueryLanguage, setQueryLanguage] = useState('Eng');
@@ -80,11 +80,11 @@ const SEMPanel = ({ numImages, setNumImages }) => {
         <p>TEXT</p>
         <div className="flex justify-center gap-8">
           <div>
-            <label>ViT-bigG-14</label>
+            <label>ViT-bigG-2B</label>
             <input
               type="radio"
-              value="ViT-bigG-14"
-              checked={ModelSelect === 'ViT-bigG-14'}
+              value="ViT-bigG-2B"
+              checked={ModelSelect === 'ViT-bigG-2B'}
               onChange={(e) => setModelSelect(e.target.value)}
             />
           </div>
@@ -98,11 +98,11 @@ const SEMPanel = ({ numImages, setNumImages }) => {
             />
           </div>
           <div>
-            <label>Blip2-ViTG</label>
+            <label>Clip-400M</label>
             <input
               type="radio"
-              value="Blip2-ViTG"
-              checked={ModelSelect === 'Blip2-ViTG'}
+              value="Clip-400M"
+              checked={ModelSelect === 'Clip-400M'}
               onChange={(e) => setModelSelect(e.target.value)}
             />
           </div>
@@ -118,7 +118,7 @@ const SEMPanel = ({ numImages, setNumImages }) => {
           <div key={index} className="flex items-start gap-2 mb-2">
             <textarea
               className="shadow appearance-none border-2 rounded w-full py-2 px-3 flex-grow"
-              placeholder="Describe what happens next"
+              placeholder={`${index === 0 ? "Describe then scene" : "Describe what happens next"} `}
               value={query}
               onChange={(e) => handleChangeMultiQuery(index, e.target.value)}
               onKeyPress={(e) => {

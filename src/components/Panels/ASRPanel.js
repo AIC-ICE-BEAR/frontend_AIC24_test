@@ -12,12 +12,12 @@ const ASRPanel = ({ numImages, setNumImages }) => {
 
     const [ASRquery, setASRquery] = useState('');
 
-    const [ASRMode, setASRMode] = useState('slow');
+    const [ASRMode, setASRMode] = useState('elastic');
     const [isASRModeSwitchChecked, setisASRModeSwitchChecked] = useState(false);
 
     const handlemodeSwitch = (checked) => {
         setisASRModeSwitchChecked(checked);
-        setASRMode(checked ? "fast" : "slow");
+        setASRMode(checked ? "fast" : "elastic");
     };
 
     return (
@@ -27,9 +27,9 @@ const ASRPanel = ({ numImages, setNumImages }) => {
             <div className="w-64 mb-5">
                 <p>ASR</p>
                 <div className="flex items-center justify-center my-4 gap-2">
-                    <label>slow</label>
+                    <label>Accurate results</label>
                     <Switch onChange={handlemodeSwitch} checked={isASRModeSwitchChecked} />
-                    <label>fast</label>
+                    <label>Faster results</label>
                 </div>
 
 

@@ -107,12 +107,18 @@ const SEMPanel = ({ numImages, setNumImages }) => {
             />
           </div>
         </div>
-
+        {/* For VBS */}
         <div className="flex items-center justify-center my-4 gap-2">
+          <label>Translate</label>
+          <Switch onChange={handleLanguageSwitch} checked={isLanguageSwitchChecked} />
+          <label></label>
+        </div>
+
+        {/* <div className="flex items-center justify-center my-4 gap-2">
           <label>Eng</label>
           <Switch onChange={handleLanguageSwitch} checked={isLanguageSwitchChecked} />
           <label>Vie</label>
-        </div>
+        </div> */}
 
         {textquerylist.map((query, index) => (
           <div key={index} className="flex items-start gap-2 mb-2">

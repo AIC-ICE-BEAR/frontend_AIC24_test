@@ -82,7 +82,7 @@ function DisplayResult({ style }) {
   }, [VQAResult]);
 
   useEffect(() => {
-
+    setSearchMode('temporal');
     setdisplayResult(TemporalResult);
 
   }, [TemporalResult]);
@@ -94,7 +94,7 @@ function DisplayResult({ style }) {
   }, [OCRResult]);
 
   useEffect(() => {
-
+    setSearchMode('asr')
     setdisplayResult(ASRResult);
 
   }, [ASRResult]);
@@ -229,7 +229,7 @@ function DisplayResult({ style }) {
         )}
         <div className="flex flex-col">
           <label className='justify-center'>Result</label>
-          <div className="flex justify-end">
+          {/* <div className="flex justify-end">
             <button className="p-4 py-1 bg-gray-300 text-black border-black border-2 rounded"
               onClick={() => {
                 if (displayResult.length === 0) {
@@ -246,14 +246,14 @@ function DisplayResult({ style }) {
               }}>
               Create CSV
             </button>
-          </div>
+          </div> */}
         </div>
 
 
         {/* For CLIP search,  OCR and Object Detection */}
         {displayResult && searchMode === 'text' && (
           <div className="overflow-y-auto h-screen" ref={scrollContainerRef}>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-6 gap-2">
               {displayResult.map((item, index) => (
                 <div
                   key={index}

@@ -12,12 +12,12 @@ const ASRPanel = ({ numImages, setNumImages }) => {
 
     const [ASRquery, setASRquery] = useState('');
 
-    const [ASRMode, setASRMode] = useState('elastic');
+    const [ASRMode, setASRMode] = useState('fast');
     const [isASRModeSwitchChecked, setisASRModeSwitchChecked] = useState(false);
 
     const handlemodeSwitch = (checked) => {
         setisASRModeSwitchChecked(checked);
-        setASRMode(checked ? "fast" : "elastic");
+        setASRMode(checked ? "elastic" : "fast");
     };
 
     return (
@@ -38,7 +38,10 @@ const ASRPanel = ({ numImages, setNumImages }) => {
                     placeholder="Fill query and press enter"
                     value={ASRquery}
                     onChange={(e) => setASRquery(e.target.value)}
-                    onKeyPress={(e) => handleKeyPressASR(e, ASRquery, ASRMode, numImages, setASRResult, setSearchMode)}
+
+                    onKeyPress={(e) => {
+                        handleKeyPressASR(e, ASRquery, ASRMode, numImages, setASRResult, setSearchMode)
+                    }}
                     rows="1"
                     style={{ height: 'auto' }}
                 />

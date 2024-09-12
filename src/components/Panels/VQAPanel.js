@@ -19,13 +19,13 @@ const VQAPanel = ({ numImages, setNumImages }) => {
     // Add text entry to session items
     const addText = (text) => {
         if (text.trim()) {
-            setSessionItems((prevItems) => [...prevItems, { type: 'text', content: text }]);
+            setSessionItems((prevItems) => [...prevItems, { type: 'text', content: text, sender: 'user' }]);
         }
     };
 
     // Add image entry to session items
     const addImage = (imageSrc) => {
-        setSessionItems((prevItems) => [...prevItems, { type: 'image', content: imageSrc }]);
+        setSessionItems((prevItems) => [...prevItems, { type: 'image', content: imageSrc, sender: 'bot' }]);
     };
 
     // Handle key press to add text and process query
@@ -48,12 +48,11 @@ const VQAPanel = ({ numImages, setNumImages }) => {
 
     };
 
-    // Add images from VQAImage to session when available
     useEffect(() => {
         if (VQAImage && VQAImage.length > imageCount) {
-            const newImages = VQAImage.slice(imageCount);
-            newImages.forEach((image) => addImage(image));
-            setImageCount(VQAImage.length);
+            const newImages = VQAImage.slice(imageCount); // Get only new images
+            newImages.forEach((image) => addImage(image)); // Use addImage from TextSession
+            setImageCount(VQAImage.length); // Update the count of images processed
         }
     }, [VQAImage, imageCount]);
 
@@ -96,7 +95,7 @@ const VQAPanel = ({ numImages, setNumImages }) => {
             {/* Refresh Button */}
             <div>
                 <img
-                    className="w-8 p-0.5 rounded-md hover:bg-black cursor-pointer"
+                    className="w-8 p-0.5 rounded-md border-gray-300 border-4 hover:border-black cursor-pointer"
                     src={'./refresh.png'}
                     alt="Refresh"
                     onClick={handleRefresh} // Call handleRefresh when clicked

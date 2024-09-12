@@ -57,9 +57,9 @@ export const handleKeyPressOCR = async (e, OCRquery, numImages, OCRMode, setOCRR
         isLoading: false,
         autoClose: 3000
       });
-
-      setOCRResult(response.data.results);
       setSearchMode('text');
+      setOCRResult(response.data.results);
+
     } catch (error) {
       console.log(error);
       toast.update(toastId, {
@@ -89,9 +89,9 @@ export const handleKeyPressASR = async (e, ASRquery, ASRMode, numImages, setASRR
         isLoading: false,
         autoClose: 3000
       });
-
+      // setSearchMode('asr');
       setASRResult(response.data.results);
-      setSearchMode('asr');
+
     } catch (error) {
       console.log(error);
       toast.update(toastId, {
@@ -257,7 +257,7 @@ export const handleKeyPressTemporal = async (e, queries, numImages, match_first,
       });
 
       setSearchResult(response.data.results);
-      setSearchMode('temporal');
+
     } catch (error) {
       console.log(error);
       toast.update(toastId, {

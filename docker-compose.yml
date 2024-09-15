@@ -4,11 +4,11 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: frontend_AIC24_test/Dockerfile
+      dockerfile: /Dockerfile
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend_AIC24_test:/app
+      - ./:/app
     networks:
       - project_network
 

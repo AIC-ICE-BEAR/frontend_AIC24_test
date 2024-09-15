@@ -21,6 +21,13 @@ const TextSession = ({ items }) => {
     useEffect(() => {
         if (items.length === 0) {
 
+            // const initialMessages = [
+            //     { type: 'text', content: 'Hi there!', sender: 'bot' },
+            //     { type: 'text', content: 'Enter your query in the text box then press enter to look for year event.', sender: 'bot' },
+            //     { type: 'text', content: 'Next, select the images that you want to ask about by pressing the QA icon button under the image.', sender: 'bot' },
+            //     { type: 'text', content: 'Then, ask your question about your image then press enter again to get the answer.', sender: 'bot' },
+            // ];
+
             const initialMessages = [
                 { type: 'text', content: 'The scene begins in a supermarket in the Binh bag area. It ends with a scene of "Neptune" brand Japonica bags, with a price tag.', sender: 'user' },
                 {

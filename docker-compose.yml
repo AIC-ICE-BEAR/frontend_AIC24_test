@@ -4,11 +4,20 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: frontend_AIC24_test/Dockerfile
     ports:
       - "3000:3000"
     volumes:
-      - ./:/app
+      - ./frontend_AIC24_test:/app
+    networks:
+      - project_network
+
+  media-server:
+    image: nginx:latest
+    ports:
+      - "8080:80" # Map port 80 in the container to port 8080 on your localhost
+    volumes:
+      - ./media:/usr/share/nginx/html/media
     networks:
       - project_network
 

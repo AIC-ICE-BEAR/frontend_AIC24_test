@@ -12,7 +12,7 @@ const OCRPanel = ({ numImages, setNumImages }) => {
 
   const [OCRquery, setOCRquery] = useState('');
 
-  const [OCRMode, setOCRMode] = useState('elastic');
+  const [OCRMode, setOCRMode] = useState('fast');
   const [isOCRModeSwitchChecked, setisOCRModeSwitchChecked] = useState(false);
 
   const handlemodeSwitch = (checked) => {

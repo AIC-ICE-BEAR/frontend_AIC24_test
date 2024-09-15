@@ -160,7 +160,7 @@ function DisplayResult({ style }) {
 
   const handleDoubleClick = (vid_name, start_id) => {
     const nextImages = [];
-    for (let i = -10; i <= 10; i++) {
+    for (let i = -30; i <= 30; i++) {
       if (start_id + i <= 0) continue
       nextImages.push({
         video_name: vid_name,

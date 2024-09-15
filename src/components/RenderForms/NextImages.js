@@ -2,7 +2,7 @@
 
 
 const renderNextImagesForm = (nextImages, selectedImage, handleImageClick, handleDoubleClick, setFormVisible) => (
-  <div className=" h-screen fixed top-20 left-0 w-full  bg-gray-800 bg-opacity-50 flex items-center justify-center">
+  <div className=" h-screen fixed top-20 left-0 z-50 w-full  bg-gray-800 bg-opacity-50 flex items-center justify-center">
     <div className="bg-white p-4 rounded">
       <h2 className="text-2xl mb-4">Surrounded images</h2>
       <div className="overflow-y-auto h-screen grid grid-cols-5 gap-2">

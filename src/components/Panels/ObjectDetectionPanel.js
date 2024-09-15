@@ -143,6 +143,7 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
         <div>
           <DroppableCanvas
             droppedItems={droppedItems}
+            setDroppedItems={setDroppedItems}
             handleDrop={handleDrop}
             handleDelete={handleDelete}
             onKeyPressFunction={handleCanvasKeyPress} // Add keypress event to the canvas

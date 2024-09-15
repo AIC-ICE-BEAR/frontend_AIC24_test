@@ -5,9 +5,15 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## Local run
 Create a folder named media and add your video and keyframe data into it
 Then create an .env file that store these information
-### `REACT_APP_IMAGE_PATH=http://localhost:8080/media/resized_keyframes
-###  REACT_APP_VIDEO_PATH=http://localhost:8080/media/Video
-###  REACT_APP_BASE_URL=http://[your backend link]:8000/`
+
+
+```cmd
+REACT_APP_IMAGE_PATH=http://localhost:8080/media/keyframes
+REACT_APP_VIDEO_PATH=http://localhost:8080/media/Video
+REACT_APP_BASE_URL=http://[your backend link]:8000/
+```
+
+
 
 Run the docker compose code
 ### `docker compose up`

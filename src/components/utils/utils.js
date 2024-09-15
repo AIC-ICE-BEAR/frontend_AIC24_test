@@ -44,10 +44,13 @@ export const mapKeyframe = async (videoName, keyFrameId) => {
 };
 
 
-export const createCSV = async (data) => {
+export const createCSV = async (data, submittedImages) => {
   // Array to hold formatted data
-  const formattedData = [];
 
+  const formattedData = []
+  for (const items of submittedImages) {
+    formattedData.push(items.text)
+  }
   // Loop through each item in the data array
   for (const item of data) {
     try {

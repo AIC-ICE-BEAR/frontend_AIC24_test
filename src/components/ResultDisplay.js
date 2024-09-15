@@ -15,7 +15,9 @@ import renderImagesSimilarityForm from './RenderForms/ImgSimilarity'
 import { VideoModal } from './RenderForms/VideoForm'
 import { mapKeyframe, createCSV } from './utils/utils'
 import { toast } from 'react-toastify';
-
+import { BiSolidLike } from "react-icons/bi";
+import { BiSolidDislike } from "react-icons/bi";
+import { useFeedbackImage } from '../contexts/ImagesFeedBack'
 
 function DisplayResult({ style }) {
   // Load results from context
@@ -55,9 +57,11 @@ function DisplayResult({ style }) {
   const [selectedImage, setselectgedImage] = useState();
   const [selectedVideo, setSelectedVideo] = useState({ video_name: "", frame_idx: 0 });
   const { ClipConfig } = useClipConfig();
+  const [submittedImages, setsubmittedImages] = useState([])
+
 
   // For image submission
-
+  const { FBImage, setFBImage } = useFeedbackImage();
   const { setSubmission } = useSubmitContext();
 
   useEffect(() => {
@@ -178,6 +182,14 @@ function DisplayResult({ style }) {
     setVQAImage([...VQAImage, image_value])
   };
 
+  const handleLikeClick = (video_name, keyframe_id) => {
+    setFBImage(`+f ${video_name} ${keyframe_id}`)
+  }
+
+  const handleDisLikeClick = (video_name, keyframe_id) => {
+    setFBImage(`-f ${video_name} ${keyframe_id}`)
+  }
+
 
 
   const submitSelectedImage = async () => {
@@ -186,6 +198,8 @@ function DisplayResult({ style }) {
     mapKeyframe(splits[0], splits[1])
       .then(result => {
         console.log("mapped keyframe", result);
+        submittedImages.push({ text: `${result.videoName.split('/').pop()}, ${result.frameIdx}`, image: splits[1] })
+        console.log(submittedImages)
         setSubmission(result)
       })
       .catch(error => {
@@ -193,7 +207,9 @@ function DisplayResult({ style }) {
       });
   };
 
-
+  const handleSubmissionRefresh = () => {
+    setsubmittedImages([])
+  }
 
   const handleImageClick = (vid_name, start_id) => {
     // this will handle image selection and submission
@@ -227,9 +243,46 @@ function DisplayResult({ style }) {
             {renderImagesSimilarityForm(ImageSimiResult, setImageSimformVisible, selectedImage, handleImageClick, handleDoubleClick, handleClickImgSim, ClipConfig, setImageSimiResult, handlePlayVideoClick)}
           </div>
         )}
-        <div className="flex flex-col">
+        {!(searchMode === 'text') && (<div className="flex flex-col">
           <label className='justify-center'>Result</label>
-          {/* <div className="flex justify-end">
+        </div>
+        )}
+        {searchMode === 'text' && (<div className="flex flex-row justify-between">
+          <div className="flex">
+            <div className="flex flex-col justify-start overflow-y-auto max-h-20">
+
+              <label >Submissione preview</label>
+
+              {submittedImages.length > 0 ? (
+                submittedImages.map((item, index) => (
+                  <tr key={index}>
+                    {/* Replace 'image.field1', 'image.field2' with actual fields from submittedImages */}
+                    <td className="border border-gray-400 px-4 py-2">{item.text}</td>
+                    <td className="border border-gray-400 px-4 py-2">{item.image}.jpg</td>
+
+                  </tr>
+                ))) :
+                <tr>
+                  <td className="border border-gray-400 px-4 py-2" colSpan="3">No data available</td>
+                </tr>
+              }
+
+
+            </div>
+
+            <div>
+              <img
+                className="w-8 p-0.5 rounded-md border-gray-300 border-4 hover:border-black cursor-pointer"
+                src={'./refresh.png'}
+                alt="Refresh"
+                onClick={handleSubmissionRefresh} // Call handleRefresh when clicked
+              />
+            </div>
+          </div>
+
+          <label className='justify-center'>Result</label>
+
+          <div className="flex justify-end">
             <button className="p-4 py-1 bg-gray-300 text-black border-black border-2 rounded"
               onClick={() => {
                 if (displayResult.length === 0) {
@@ -239,86 +292,87 @@ function DisplayResult({ style }) {
                   if (searchMode === "asr") {
                     console.log("Not the correct mode")
                   }
+                  if (searchMode === "temporal") {
+                    console.log("Not the correct mode")
+                  }
+                  if (searchMode === "vqa") {
+                    console.log("Not the correct mode")
+                  }
                   else {
-                    createCSV(displayResult)
+                    createCSV(displayResult, submittedImages)
                   }
                 }
               }}>
               Create CSV
             </button>
-          </div> */}
+          </div>
         </div>
+        )}
 
 
         {/* For CLIP search,  OCR and Object Detection */}
         {displayResult && searchMode === 'text' && (
           <div className="overflow-y-auto h-screen" ref={scrollContainerRef}>
-            <div className="grid grid-cols-6 gap-2">
+            <div className="grid grid-cols-5 gap-2">
               {displayResult.map((item, index) => (
                 <div
                   key={index}
-                  className={`border p-1 bg-white ${selectedImage === `${item.video_name}-${item.keyframe_id}` ? 'border-4 border-red-500' : 'border-gray-300'}`}
+                  className={`relative border p-1 bg-white ${selectedImage === `${item.video_name}-${item.keyframe_id}` ? 'border-4 border-red-500' : 'border-gray-300'}`}
                 >
+                  {/* Like and Dislike buttons */}
+                  <div className="flex justify-between mb-2">
+                    <button className="text-green-500 hover:text-green-700" onClick={() => handleLikeClick(item.video_name, item.keyframe_id)}>
+                      <BiSolidLike className="w-6 h-6" />
+                    </button>
+                    <button className="text-red-500 hover:text-red-700" onClick={() => handleDisLikeClick(item.video_name, item.keyframe_id)} >
+                      <BiSolidDislike className="w-6 h-6" />
+                    </button>
+                  </div>
+
                   <img
                     src={`${process.env.REACT_APP_IMAGE_PATH}/${item.video_name}/${item.keyframe_id}.jpg`}
                     className="w-full h-auto"
                     alt={item.keyframe_id}
                     onClick={() => handleImageClick(item.video_name, item.keyframe_id)}
                     onDoubleClick={() => handleDoubleClick(item.video_name, item.keyframe_id)}
-
                   />
 
-                  <div className='flex'>
-                    <img className="w-8 p-0.5 rounded-md  hover:bg-black"
+                  <div className="flex mt-2">
+                    <img className="w-8 p-0.5 rounded-md hover:bg-black"
                       src={'./imgSim.png'}
                       onClick={() => {
-                        handleClickImgSim(item.video_name, item.keyframe_id, ClipConfig, setImageSimiResult, setImageSimformVisible)
+                        handleClickImgSim(item.video_name, item.keyframe_id, ClipConfig, setImageSimiResult, setImageSimformVisible);
                       }}
-                      alt="img-sim"></img>
+                      alt="img-sim"
+                    />
 
-                    <img className="w-8 p-0.5 rounded-md  hover:bg-black"
+                    <img className="w-8 p-0.5 rounded-md hover:bg-black"
                       src={'./play_button.jpg'}
                       onClick={() => {
-
-                        handlePlayVideoClick(item.video_name, item.keyframe_id)
+                        handlePlayVideoClick(item.video_name, item.keyframe_id);
                       }}
-                      alt="vid-watch">
+                      alt="vid-watch"
+                    />
 
-                    </img>
-
-                    <img className="w-8 p-0.5 rounded-md  hover:bg-black"
-
+                    <img className="w-8 p-0.5 rounded-md hover:bg-black"
                       src={'./image_icon.jpg'}
-
                       onClick={() => {
-
-                        handleDoubleClick(item.video_name, item.keyframe_id)
+                        handleDoubleClick(item.video_name, item.keyframe_id);
                       }}
-                      alt="vid-watch">
+                      alt="img-watch"
+                    />
 
-                    </img>
-
-                    <img className="w-8 p-0.5 rounded-md  hover:bg-black"
-
+                    <img className="w-8 p-0.5 rounded-md hover:bg-black"
                       src={'./VQA.jpg'}
-
                       onClick={() => {
-
-                        handleVQAClick(item.video_name, item.keyframe_id)
+                        handleVQAClick(item.video_name, item.keyframe_id);
                       }}
-                      alt="vid-watch">
-
-                    </img>
-
-
-
+                      alt="vqa"
+                    />
                   </div>
 
-
-
-
+                  {/* Display the image name */}
                   {item.video_name} {item.keyframe_id}.jpg
-
                 </div>
               ))}
             </div>

@@ -5,6 +5,7 @@ import { handleKeyPressFused } from "../utils/ServicesUtils";
 import { useSearchResult } from '../../contexts/ClipsearchContext';
 import { useModeContext } from '../../contexts/searchModeContext';
 import { useClipConfig } from '../../contexts/ClipSearchConfigContext';
+import { useFeedbackImage } from '../../contexts/ImagesFeedBack'
 
 const SEMPanel = ({ numImages, setNumImages }) => {
   const { setSearchResult } = useSearchResult();
@@ -16,6 +17,7 @@ const SEMPanel = ({ numImages, setNumImages }) => {
   const [textquerylist, settextquerylist] = useState(['']); // Initialize with primary Textquery
   const [QueryLanguage, setQueryLanguage] = useState('Eng');
   const [isLanguageSwitchChecked, setIsLanguageSwitchChecked] = useState(false);
+  const { FBImage, setFBImage } = useFeedbackImage();
 
   const handleLanguageSwitch = (checked) => {
     setIsLanguageSwitchChecked(checked);
@@ -50,6 +52,17 @@ const SEMPanel = ({ numImages, setNumImages }) => {
       setTextquery(value);
     }
   };
+
+  useEffect(() => {
+    console.log(FBImage)
+    if (!(FBImage === '')) {
+      const newTextQueryList = [...textquerylist];
+      newTextQueryList[textquerylist.length - 1] = newTextQueryList[textquerylist.length - 1] + " " + FBImage;
+      settextquerylist(newTextQueryList);
+      setFBImage('')
+    }
+
+  }, [FBImage])
 
   useEffect(() => {
     setClipConfig(ModelSelect + "#" + numImages);

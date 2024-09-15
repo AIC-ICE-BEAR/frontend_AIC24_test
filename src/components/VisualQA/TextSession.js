@@ -22,10 +22,16 @@ const TextSession = ({ items }) => {
         if (items.length === 0) {
 
             const initialMessages = [
-                { type: 'text', content: 'Hi there!', sender: 'bot' },
-                { type: 'text', content: 'Enter your query in the text box then press enter to look for year event.', sender: 'bot' },
-                { type: 'text', content: 'Next, select the images that you want to ask about by pressing the QA icon button under the image.', sender: 'bot' },
-                { type: 'text', content: 'Then, ask your question about your image then press enter again to get the answer.', sender: 'bot' },
+                { type: 'text', content: 'The scene begins in a supermarket in the Binh bag area. It ends with a scene of "Neptune" brand Japonica bags, with a price tag.', sender: 'user' },
+                {
+                    type: 'image', content: {
+                        video_name: "L04/L04_V029",
+                        keyframe: 183
+                    }
+                    , sender: 'bot'
+                },
+                { type: 'text', content: 'What percentage discount is written for this product?', sender: 'user' },
+                { type: 'text', content: 'The discount percentage is 19%', sender: 'bot' },
             ];
             setSessionItems(initialMessages); // Reset to initial bot messages
         } else {
@@ -58,7 +64,7 @@ const TextSession = ({ items }) => {
                     className={`flex ${item.sender === 'bot' ? 'justify-start' : 'justify-end'}`}
                 >
                     {item.type === 'text' ? (
-                        <p className={`p-3 rounded-lg max-w-xs ${item.sender === 'bot' ? 'bg-gray-100 text-left' : 'bg-blue-100 text-right'}`}>
+                        <p className={`p-3 rounded-lg max-w-xs ${item.sender === 'bot' ? 'bg-gray-100 text-left' : 'bg-blue-100 text-left'}`}>
                             {item.content}
                         </p>
                     ) : (

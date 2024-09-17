@@ -82,3 +82,45 @@ export const createCSV = async (data, submittedImages) => {
   link.click();
   document.body.removeChild(link);
 };
+
+
+
+export const createCSV_VQA = async (data, submittedImages, answer) => {
+  // Array to hold formatted data
+  console.log(data)
+  const formattedData = []
+  for (const items of submittedImages) {
+    formattedData.push(items.text)
+  }
+  // Loop through each item in the data array
+  for (const item of data) {
+    try {
+      // Wait for mapKeyframe to resolve and get the frameIdx
+      const result = await mapKeyframe(item.video_name, item.keyframe_id);
+
+      const frameIdx = result.frameIdx;
+
+      // Format the data and push to the formattedData array
+      formattedData.push(`${item.video_name.split('/').pop()}, ${frameIdx},${answer}`);
+    } catch (error) {
+      console.error('Error mapping keyframe:', error);
+    }
+  }
+
+  // Join all formatted lines into a single string with newline separators
+  const csvContent = formattedData.join('\n');
+
+  // Create a Blob from the CSV content
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+  // Create a download link and trigger a click event
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'output.csv');
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+

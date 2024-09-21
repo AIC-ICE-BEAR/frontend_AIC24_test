@@ -54,10 +54,9 @@ const SEMPanel = ({ numImages, setNumImages }) => {
   };
 
   useEffect(() => {
-    console.log(FBImage)
+
     if (!(FBImage === '')) {
-      const newTextQueryList = [...textquerylist];
-      newTextQueryList[textquerylist.length - 1] = newTextQueryList[textquerylist.length - 1] + " " + FBImage;
+      const newTextQueryList = [...textquerylist, FBImage];
       settextquerylist(newTextQueryList);
       setFBImage('')
     }
@@ -66,7 +65,7 @@ const SEMPanel = ({ numImages, setNumImages }) => {
 
   useEffect(() => {
     setClipConfig(ModelSelect + "#" + numImages);
-    console.log("Clip config", ClipConfig);
+
   }, [ModelSelect, numImages]);
 
   const handleMuliQueryPress = (e, query) => {

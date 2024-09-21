@@ -83,7 +83,6 @@ function DisplayResult({ style }) {
   useEffect(() => {
 
     setdisplayResult(searchResult);
-
   }, [searchResult]);
 
   useEffect(() => {
@@ -95,7 +94,6 @@ function DisplayResult({ style }) {
   useEffect(() => {
     setSearchMode('temporal');
     setdisplayResult(TemporalResult);
-
   }, [TemporalResult]);
 
   useEffect(() => {
@@ -105,15 +103,15 @@ function DisplayResult({ style }) {
   }, [OCRResult]);
 
   useEffect(() => {
-    setSearchMode('asr')
-    setdisplayResult(ASRResult);
 
+    setSearchMode('asr');
+    setdisplayResult(ASRResult);
   }, [ASRResult]);
+
 
   useEffect(() => {
 
     setdisplayResult(OBDetResult);
-
   }, [OBDetResult]);
 
 

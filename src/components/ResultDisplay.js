@@ -118,7 +118,6 @@ function DisplayResult({ style }) {
     setdisplayResult(OBDetResult);
   }, [OBDetResult]);
 
-
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.key === 'Escape') {
@@ -320,7 +319,6 @@ function DisplayResult({ style }) {
         <CSVPreview
           searchMode={searchMode}
           displayResult={displayResult}
-          submittedImages={submittedImages}
           handleSubmissionRefresh={handleSubmissionRefresh}
           createCSV={createCSV}
         />

@@ -21,12 +21,15 @@ function ASRSearchResult({
     useEffect(() => {
         const fetchAllKeyframes = async () => {
             const indices = {};
+            console.log(displayResult)
             for (const item of displayResult) {
-                try {
-                    const index = await getkeyframe(item.video_name, item.keyframe_id);
-                    indices[`${item.video_name}-${item.keyframe_id}`] = index; // Store index using a unique key
-                } catch (error) {
-                    console.error("Error fetching keyframe:", error);
+                for (const key_id of item.keyframe_id) {
+                    try {
+                        const index = await getkeyframe(item.video_name, key_id);
+                        indices[`${item.video_name}-${key_id}`] = index; // Store index using a unique key
+                    } catch (error) {
+                        console.error("Error fetching keyframe:", error);
+                    }
                 }
             }
             setFrameIndices(indices); // Update state with all frame indices

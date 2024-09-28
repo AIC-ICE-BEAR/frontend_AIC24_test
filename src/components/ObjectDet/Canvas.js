@@ -6,7 +6,7 @@ export const DraggableIcon = ({ icon, onDragStart }) => {
 
   return (
     <div
-      draggable
+      draggable="true" // Enable dragging for Tailwind
       onDragStart={(e) => onDragStart(e, icon)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -26,14 +26,15 @@ export const DraggableColor = ({ icon, onDragStart }) => {
   return (
     <div
       draggable
-      onDragStart={(e) => onDragStart(e, icon)}
+      onDragStart={(e) => onDragStart(e, icon)} // Make sure icon data is set for color
       className="flex flex-col items-center justify-center cursor-pointer w-6 h-6"
       style={{ backgroundColor: icon.color }}
     />
   );
 };
 
-const DroppableCanvas = ({ droppedItems, setDroppedItems, handleDrop, handleDelete, onKeyPressFunction }) => {
+
+const DroppableCanvas = ({ droppedItems, setDroppedItems, handleDelete }) => {
   const [width, setWidth] = useState(300);
   const [height, setHeight] = useState(200);
   const [resizing, setResizing] = useState(null);
@@ -41,92 +42,170 @@ const DroppableCanvas = ({ droppedItems, setDroppedItems, handleDrop, handleDele
   const rows = 10;
   const cols = 10;
 
+  // Minimum size for items
+  const MIN_SIZE = 30;
+
   // Initialize objectDetection field if it does not exist
   const initializeObjectDetection = (item) => ({
     topLeft: { x: item.x, y: item.y },
-    bottomRight: { x: item.x + item.width, y: item.y + item.height },
+    bottomRight: { x: item.x + (item.width || 0), y: item.y + (item.height || 0) },
     canvasSize: { width, height },
   });
 
   const handleMouseDown = (index, e) => {
+    e.preventDefault();
     e.stopPropagation();
-    setResizing({
-      index,
-      startX: e.clientX,
-      startY: e.clientY,
-      startWidth: droppedItems[index].width,
-      startHeight: droppedItems[index].height,
-    });
+    // Only handle resizing if clicked on the resize handle
+    if (e.target.classList.contains('resize-handle')) {
+      setResizing({
+        index,
+        startX: e.clientX,
+        startY: e.clientY,
+        startWidth: droppedItems[index].width || 50, // Fallback to 50 if width is undefined
+        startHeight: droppedItems[index].height || 50, // Fallback to 50 if height is undefined
+      });
+    }
   };
+
+
+  const handleDrop = (e) => {
+    // Prevent default browser behavior
+    e.preventDefault();
+
+    // Get the data from the event (either icon, color, or dropped item data)
+    const iconData = e.dataTransfer.getData('icon');
+    const colorData = e.dataTransfer.getData('color'); // Add color data handling
+    const droppedItemData = e.dataTransfer.getData('dropped-item');
+
+    // Get the position of the drop relative to the canvas
+    const canvasRect = e.currentTarget.getBoundingClientRect();
+    const dropX = e.clientX - canvasRect.left;
+    const dropY = e.clientY - canvasRect.top;
+
+    if (iconData) {
+      // If a new icon is being dropped
+      const icon = JSON.parse(iconData);
+      const newItem = {
+        ...icon,
+        x: dropX,
+        y: dropY,
+        width: icon.width || 50, // Default width if not provided
+        height: icon.height || 50, // Default height if not provided
+      };
+
+      // Initialize object detection for the new item
+      newItem.objectDetection = initializeObjectDetection(newItem);
+
+      // Add the new item to dropped items
+      setDroppedItems([...droppedItems, newItem]);
+    } else if (colorData) {
+      // If a new color is being dropped
+      const color = JSON.parse(colorData);
+      const newItem = {
+        ...color,
+        x: dropX,
+        y: dropY,
+        width: color.width || 50, // Default width for color
+        height: color.height || 50, // Default height for color
+        color: color.color, // Ensure color is passed correctly
+      };
+
+      // Initialize object detection for the new color item
+      newItem.objectDetection = initializeObjectDetection(newItem);
+
+      // Add the new color item to dropped items
+      setDroppedItems([...droppedItems, newItem]);
+    } else if (droppedItemData) {
+      // If an existing item is being repositioned
+      const item = JSON.parse(droppedItemData);
+      const updatedItems = [...droppedItems];
+
+      // Update the x and y position of the existing item
+      updatedItems[item.index] = {
+        ...updatedItems[item.index],
+        x: dropX,
+        y: dropY,
+      };
+
+      // Update object detection for the repositioned item
+      updatedItems[item.index].objectDetection = initializeObjectDetection(updatedItems[item.index]);
+
+      // Update the dropped items state
+      setDroppedItems(updatedItems);
+    }
+  };
+
+
+
 
   const handleMouseMove = (e) => {
     if (resizing) {
       const { index, startX, startY, startWidth, startHeight } = resizing;
-      const newWidth = startWidth + (e.clientX - startX);
-      const newHeight = startHeight + (e.clientY - startY);
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+
+      const newWidth = Math.max(MIN_SIZE, startWidth + deltaX);
+      const newHeight = Math.max(MIN_SIZE, startHeight + deltaY);
 
       const updatedItems = [...droppedItems];
       updatedItems[index] = {
         ...updatedItems[index],
-        width: newWidth > 30 ? newWidth : 30,
-        height: newHeight > 30 ? newHeight : 30,
+        width: newWidth,
+        height: newHeight,
       };
 
-      // Update objectDetection
-      updatedItems[index].objectDetection = initializeObjectDetection(updatedItems[index]);
+      // Ensure the new width and height are valid numbers before updating objectDetection
+      if (!isNaN(newWidth) && !isNaN(newHeight)) {
+        updatedItems[index].objectDetection = initializeObjectDetection(updatedItems[index]);
+      }
 
       setDroppedItems(updatedItems);
     } else if (draggingItem) {
-      const { index, startX, startY } = draggingItem;
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
+      const { index, offsetX, offsetY } = draggingItem;
+      const newX = e.clientX - offsetX;
+      const newY = e.clientY - offsetY;
 
       const updatedItems = [...droppedItems];
       updatedItems[index] = {
         ...updatedItems[index],
-        x: updatedItems[index].x + dx,
-        y: updatedItems[index].y + dy,
+        x: newX,
+        y: newY,
       };
 
-      // Update objectDetection
+      // Update objectDetection after the item is moved
       updatedItems[index].objectDetection = initializeObjectDetection(updatedItems[index]);
 
       setDroppedItems(updatedItems);
-      setDraggingItem({ ...draggingItem, startX: e.clientX, startY: e.clientY });
     }
   };
+
+
 
   const handleMouseUp = () => {
     setResizing(null);
     setDraggingItem(null); // End dragging
   };
 
-  const handleDragStart = (e, item) => {
-    e.stopPropagation();
-    e.dataTransfer.setData('dropped-item', JSON.stringify({ ...item }));
+
+  const handleMouseDownForDragging = (index, e) => {
+    e.preventDefault();
     setDraggingItem({
-      index: droppedItems.findIndex(d => d === item),
+      index,
       startX: e.clientX,
       startY: e.clientY,
+      offsetX: e.clientX - droppedItems[index].x, // Offset to keep the mouse position consistent
+      offsetY: e.clientY - droppedItems[index].y,
     });
   };
 
-  const canDrag = (e, item) => {
-    const centerX = e.target.clientWidth / 2;
-    const centerY = e.target.clientHeight / 2;
-    const zoneSize = 10;
-    const clickX = e.nativeEvent.offsetX;
-    const clickY = e.nativeEvent.offsetY;
-    return (
-      clickX > centerX - zoneSize && clickX < centerX + zoneSize &&
-      clickY > centerY - zoneSize && clickY < centerY + zoneSize
-    );
-  };
-
   return (
-    <div className="flex flex-col items-center" onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
+    <div
+      className="flex flex-col items-center"
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+    >
       <div
-        onKeyPress={(e) => onKeyPressFunction(e, droppedItems)}
+        // onKeyPress={(e) => onKeyPressFunction(e, droppedItems, numImages, setOBDetResult, setSearchMode)}
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
         tabIndex={0}
@@ -156,10 +235,12 @@ const DroppableCanvas = ({ droppedItems, setDroppedItems, handleDrop, handleDele
             }}
             className="relative cursor-move"
             draggable
-            onDragStart={(e) => canDrag(e, item) ? handleDragStart(e, item) : e.preventDefault()}
+            onMouseDown={(e) => handleMouseDownForDragging(index, e)}
+
           >
+            {/* Resize Handle */}
             <div
-              className="absolute bottom-[-10px] right-[-10px] w-4 h-4 bg-gray-500 cursor-se-resize"
+              className="absolute resize-handle bottom-[-5px] right-[-5px] w-4 h-4 bg-gray-500"
               style={{ cursor: 'se-resize' }}
               onMouseDown={(e) => handleMouseDown(index, e)}
             ></div>
@@ -196,11 +277,11 @@ const DroppableCanvas = ({ droppedItems, setDroppedItems, handleDrop, handleDele
 
             <p className="text-xs text-center">{item.label}</p>
 
-            <p className="text-xs">
+            {/* <p className="text-xs">
               TL: ({item.objectDetection?.topLeft.x}, {item.objectDetection?.topLeft.y}) <br />
-              BR: ({item.objectDetection?.bottomRight.x}, {item.objectDetection?.bottomRight.y}) <br />
+              BR: ({item.objectDetection?.bottomRight.x || 0}, {item.objectDetection?.bottomRight.y || 0}) <br />
               Canvas: {item.objectDetection?.canvasSize.width} x {item.objectDetection?.canvasSize.height}
-            </p>
+            </p> */}
           </div>
         ))}
       </div>
@@ -209,3 +290,5 @@ const DroppableCanvas = ({ droppedItems, setDroppedItems, handleDrop, handleDele
 };
 
 export default DroppableCanvas;
+
+

@@ -87,34 +87,41 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
         settextquerylist(newTextQueryList);
     };
 
+
+    const handleRemoveTranslate = (index) => {
+
+        const newTranslateResult = TranslateResult.filter((_, i) => i !== index);
+        setTranslateResult(newTranslateResult);
+    };
+
     return (
-        <div className="p-4 border-b ">
+        <div className="p-4 border-b max-h-full overflow-y-auto">
             <div className="query-controls mb-5">
                 <p className="pb-4">TEMPORAL</p>
                 <div className="query-controls mb-5">
-                    Model select
-                    <div className="flex justify-center gap-8">
 
+                    <div className="flex flex-col pt-5 justify-center gap-4">
+                        <p>Model select</p>
                         <select
                             id="modelSelect"
                             value={ModelSelect}
                             onChange={(e) => setModelSelect(e.target.value)}
-                            className="border border-gray-300 rounded p-4 text-sm"
+                            className="border border-black rounded p-4 text-sm"
                         >
                             <option value="ViT-bigG-2B">ViT-bigG-2B</option>
                             <option value="ViT 5b">ViT 5b</option>
                             <option value="Clip-400M">Clip-400M</option>
                         </select>
                     </div>
-                    Select metric
 
-                    <div className="flex justify-center gap-8">
 
+                    <div className="flex flex-col justify-center gap-4">
+                        <p>Select metric</p>
                         <select
                             id="metrci select"
                             value={TemporalMetric}
                             onChange={(e) => setTemporalMetric(e.target.value)}
-                            className="border border-gray-300 rounded p-4 text-sm"
+                            className="border border-black rounded p-4 text-sm"
                         >
                             <option value="dot">dot</option>
                             <option value="exp_dot">exp_dot</option>
@@ -137,8 +144,9 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                 </div>
 
                 {TranslateResult.map((translatedQuery, index) => (
-                    <div>
+                    <div >
                         query {index}
+
                         <textarea
                             className="shadow appearance-none border-2 rounded w-full py-2 px-3 flex-grow"
                             value={translatedQuery}
@@ -146,6 +154,13 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                             rows="1"
                             style={{ height: 'auto' }}
                         />
+
+                        <button
+                            onClick={() => handleRemoveTranslate(index)}
+                            className="ml-2 px-2 py-1 bg-red-500 text-white rounded"
+                        >
+                            -
+                        </button>
                     </div>
                 ))}
 
@@ -167,12 +182,12 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                                         const Translated = await handleKeyPressTranslate(e, textquerylist, setTranslateResult);
 
 
-                                        handleKeyPressTemporal(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMode, TemporalMetric, QueryLanguage, ModelSelect, setTemporalResult, setSearchMode);
+                                        handleKeyPressTemporal(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMode, TemporalMetric, ModelSelect, setTemporalResult, setSearchMode);
                                     }
                                 }
                                 else {
 
-                                    handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMode, TemporalMetric, QueryLanguage, ModelSelect, setTemporalResult, setSearchMode);
+                                    handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMode, TemporalMetric, ModelSelect, setTemporalResult, setSearchMode);
                                 }
                                 setClipConfig(ModelSelect + "#" + numImages);
 

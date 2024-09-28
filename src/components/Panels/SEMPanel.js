@@ -67,19 +67,25 @@ const SEMPanel = ({ numImages, setNumImages }) => {
     settextquerylist(newTextQueryList);
   };
 
+  const handleRemoveTranslate = (index) => {
+
+    const newTranslateResult = TranslateResult.filter((_, i) => i !== index);
+    setTranslateResult(newTranslateResult);
+  };
+
   return (
-    <div className="p-4 border-b w-80 ">
+    <div className="p-4 border-b w-80 max-h-full overflow-y-auto">
       <div className="query-controls mb-5">
         <p>TEXT</p>
         <div className="query-controls mb-5">
 
-          <div className="flex justify-center gap-8">
-
+          <div className="flex flex-col pt-5 justify-center gap-2">
+            <p>Model select</p>
             <select
               id="modelSelect"
               value={ModelSelect}
               onChange={(e) => setModelSelect(e.target.value)}
-              className="border border-gray-300 rounded p-4 text-sm"
+              className="border border-black rounded p-4 text-sm"
             >
               <option value="ViT-bigG-2B">ViT-bigG-2B</option>
               <option value="ViT 5b">ViT 5b</option>
@@ -109,6 +115,13 @@ const SEMPanel = ({ numImages, setNumImages }) => {
               rows="1"
               style={{ height: 'auto' }}
             />
+
+            <button
+              onClick={() => handleRemoveTranslate(index)}
+              className="ml-2 px-2 py-1 bg-red-500 text-white rounded"
+            >
+              -
+            </button>
           </div>
         ))}
 

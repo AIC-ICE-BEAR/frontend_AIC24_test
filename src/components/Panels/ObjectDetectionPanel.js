@@ -6,7 +6,7 @@ import { useModeContext } from '../../contexts/searchModeContext';
 import { useClipConfig } from '../../contexts/ClipSearchConfigContext';
 import DroppableCanvas, { DraggableIcon, DraggableColor } from '../ObjectDet/Canvas';
 import Switch from "react-switch";
-
+import { FaSearch } from "react-icons/fa";
 
 
 
@@ -55,26 +55,13 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
 
 
   // Canvas dropping
-  const handleDragStart = (e, icon) => {
-    e.dataTransfer.setData('icon', JSON.stringify(icon));
-  };
-
-  const handleDrop = (e) => {
-    const data = e.dataTransfer.getData('icon');
-    const droppedItemData = e.dataTransfer.getData('dropped-item');
-
-    const canvasRect = e.currentTarget.getBoundingClientRect();
-    const dropX = e.clientX - canvasRect.left;
-    const dropY = e.clientY - canvasRect.top;
-
-    if (data) {
-      const icon = JSON.parse(data);
-      setDroppedItems([...droppedItems, { ...icon, x: dropX, y: dropY }]);
-    } else if (droppedItemData) {
-      const item = JSON.parse(droppedItemData);
-      const updatedItems = [...droppedItems];
-      updatedItems[item.index] = { ...updatedItems[item.index], x: dropX, y: dropY };
-      setDroppedItems(updatedItems);
+  const handleDragStart = (e, item) => {
+    if (item.color) {
+      // If the item is a color
+      e.dataTransfer.setData('color', JSON.stringify(item));
+    } else {
+      // If the item is an icon
+      e.dataTransfer.setData('icon', JSON.stringify(item));
     }
   };
 
@@ -116,12 +103,6 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
     return items.filter(item => item.name.includes(input));
   };
 
-  const handleCanvasKeyPress = (e, droppedItems) => {
-    if (e.key === 'Enter') {
-      console.log("Dropped items", droppedItems)
-    }
-  };
-
   return (
     <div className='w-full h-full mb-5 items-center'>
       <h2 className="text-lg font-bold mb-4">Objects & Colors of the Scene</h2>
@@ -140,15 +121,18 @@ const ObjectDetectionPanel = ({ numImages, setNumImages }) => {
           ))}
         </div>
 
-        <div>
+        <div
+          onKeyPress={(e) => handleKeyPressOBJCOLOR(e, droppedItems, numImages, setOBDetResult, setSearchMode)}
+        >
           <DroppableCanvas
             droppedItems={droppedItems}
             setDroppedItems={setDroppedItems}
-            handleDrop={handleDrop}
+            // handleDrop={handleDrop}
             handleDelete={handleDelete}
-            onKeyPressFunction={handleCanvasKeyPress} // Add keypress event to the canvas
-            tabIndex={0} // Make the canvas focusable to capture keypress events
+            tabIndex={0}
           />
+
+
         </div>
       </div>
 

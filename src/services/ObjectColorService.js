@@ -16,8 +16,9 @@ class ObjectColorService {
 
             })
 
-            const response = await this.axiosInstance.post('/search_ObjectColor', {
-                "query": query,
+            const response = await this.axiosInstance.post('/search_ObjectLoc', {
+                "class_ids": query.class_ids,
+                "box_cords": query.box_cords,
                 "topk": numImages
 
             });

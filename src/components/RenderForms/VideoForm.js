@@ -12,14 +12,17 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
   const [hoverTime, setHoverTime] = useState(null); // Hover time for preview
   const [previewImage, setPreviewImage] = useState(null); // Preview image
   const [imageFrames, setImageFrames] = useState([]);
+  const [preloadedImages, setPreloadedImages] = useState([]);
   const [videoFPS, setvideoFPS] = useState(25);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [currentTime, setCurrentTime] = useState(0);
   const { submittedImages, setsubmittedImages } = useCSVPreview()
 
 
   const handleOpenImageInNewTab = (video_name) => {
-    const videoUrl = `${process.env.REACT_APP_VIDEO_PATH}/${video_name}_480p.mp4`;
+
+    const videoUrl = `${video_name.includes('_a') ? `${process.env.REACT_APP_VIDEO_PATH}/${video_name}.mp4`
+      : `${process.env.REACT_APP_VIDEO_PATH}/${video_name}_480p.mp4`}`;
+
     window.open(videoUrl, '_blank');
   };
 
@@ -63,12 +66,27 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
   useEffect(() => {
     const fetchImageList = async () => {
       try {
-        // Assuming you have a function to fetch image data and map it into imageList
         const imageList = await getImageListFromCSV(videoUrl);
-        const updatedImageList = imageList.slice(0, -1);
+        const updatedImageList = imageList.slice(0, -1); // Remove the last image if needed
 
         setImageFrames(updatedImageList);
 
+        // Pre-map the images to corresponding time ranges based on the video duration
+        if (videoRef.current) {
+          const videoDuration = videoRef.current.duration;
+          const mappedImages = updatedImageList.map((frame, index) => {
+            const frameTime = frame.time;
+            const nextFrameTime = updatedImageList[index + 1]?.time || videoDuration; // Handle the last frame
+
+            return {
+              frame,
+              startTime: frameTime,
+              endTime: nextFrameTime
+            };
+          });
+
+          setPreloadedImages(mappedImages);
+        }
       } catch (error) {
         console.error('Error fetching image list:', error);
       }
@@ -78,6 +96,14 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
       fetchImageList();
     }
   }, [videoUrl]);
+
+  const getPreloadedImage = (hoverTime) => {
+    // Find the image that corresponds to the hoverTime
+    const preloadedImage = preloadedImages.find(
+      (image) => hoverTime >= image.startTime && hoverTime <= image.endTime
+    );
+    return preloadedImage ? preloadedImage.frame : null;
+  };
 
   const skipForward = () => {
     if (videoRef.current) {
@@ -93,20 +119,33 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
 
   // Helper function to find the closest image based on the hover time
   const findClosestImage = (hoverTime) => {
-    let closestImage = null;
-    let closestTimeDifference = Infinity;
+    if (imageFrames.length === 0) return null;
 
-    imageFrames.forEach((frame) => {
-      const timeDifference = Math.abs(hoverTime - frame.time);
+    let low = 0;
+    let high = imageFrames.length - 1;
 
-      if (timeDifference < closestTimeDifference) {
-        closestTimeDifference = timeDifference;
-        closestImage = frame;
+    // Perform binary search
+    while (low <= high) {
+      const mid = Math.floor((low + high) / 2);
+      const midTime = imageFrames[mid].time;
+
+      if (midTime === hoverTime) {
+        return imageFrames[mid]; // Exact match
+      } else if (midTime < hoverTime) {
+        low = mid + 1;
+      } else {
+        high = mid - 1;
       }
-    });
+    }
 
-    return closestImage;
+    // After binary search, check which of the two closest times is better
+    const closest = (low < imageFrames.length && high >= 0)
+      ? (Math.abs(imageFrames[low]?.time - hoverTime) < Math.abs(imageFrames[high]?.time - hoverTime) ? imageFrames[low] : imageFrames[high])
+      : imageFrames[low] || imageFrames[high];
+
+    return closest;
   };
+
 
   // Handle mouse movement on progress bar
   const handleMouseMove = (e) => {
@@ -118,9 +157,9 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
     // Update hover time state
     setHoverTime(hoverTime);
 
-    // Find the closest image based on hoverTime
-    const closestImage = findClosestImage(hoverTime);
-    setPreviewImage(closestImage); // Update the preview image to the closest available frame
+    // Get the preloaded image directly based on hover time
+    const preloadedImage = getPreloadedImage(hoverTime);
+    setPreviewImage(preloadedImage); // Update the preview image
 
     // Update mouse position state
     setMousePosition({ x: e.clientX, y: e.clientY });
@@ -154,7 +193,6 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
 
     const closestImage = findClosestImage(currentTime);
     submittedImages.push({ text: `${videoUrl.split('/').pop()}, ${frame}`, image: closestImage.imageUrl.split('/').pop().slice(0, -4) })
-
 
   };
 
@@ -215,14 +253,16 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
         ref={progressBarRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        onClick={handleProgressBarClick} // Add the click event handler here
+        onClick={handleProgressBarClick}
         style={{ cursor: "pointer" }}
       >
         {/* Progress bar itself */}
         <div
           className="absolute left-0 top-0 h-full bg-red-500"
           style={{
-            width: `${(videoRef.current && videoRef.current.duration > 0 ? (videoRef.current.currentTime / videoRef.current.duration) * 100 : 0)}%`,
+            width: `${(videoRef.current && videoRef.current.duration > 0
+              ? (videoRef.current.currentTime / videoRef.current.duration) * 100
+              : 0)}%`,
           }}
         />
 
@@ -232,24 +272,24 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
             className="fixed bg-black text-white p-2"
             style={{
               left: `${mousePosition.x + 150}px`,
-              top: `${mousePosition.y - 50}px`, // Adjust this to position the preview image slightly above the mouse cursor
-              transform: "translateX(-50%)", // Center the preview image horizontally
-              pointerEvents: "none" // Prevent the preview from interfering with mouse events
+              top: `${mousePosition.y - 50}px`,
+              transform: "translateX(-50%)",
+              pointerEvents: "none",
             }}
           >
             <img src={previewImage.imageUrl} alt="Preview" width="160" height="90" />
             <span>{Math.floor(hoverTime)}s</span>
+            {/* <span>{previewImage.imageUrl}</span> */}
           </div>
         )}
       </div>
-
-      {/* Button to get current time */}
       <button
         className="mt-2 bg-blue-500 text-white p-2 rounded"
         onClick={getCurrentTime}
       >
         <FaPaperPlane />
       </button>
+
     </div>
   );
 };

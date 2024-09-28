@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { createCSV_VQA } from '../utils/utils'
+import { useCSVPreview } from '../../contexts/CSVPreviewContext'
 
 function CSVPreview({
     searchMode,
     displayResult,
-    submittedImages,
     handleSubmissionRefresh,
     createCSV
 }) {
     const [Answer, setAnswer] = useState('');
+    const { submittedImages } = useCSVPreview()
     return (
         <div>
             <div className="flex flex-row justify-between">

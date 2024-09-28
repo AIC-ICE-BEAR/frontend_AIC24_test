@@ -6,6 +6,7 @@ import ASRservice from '../../services/ASRservice';
 import OBDetservice from '../../services/OBDetservice';
 import ImgSimiLarservice from '../../services/ImageSimiService'
 import fusedservice from '../../services/FusedSearchService'
+import transalteservice from '../../services/TranslateService'
 import ObjectColorservice from '../../services/ObjectColorService'
 import temporalservice from '../../services/TemporalService'
 
@@ -240,14 +241,14 @@ export const handleKeyPressFused = async (e, queries, numImages, ModelSelect, se
   }
 };
 
-export const handleKeyPressTemporal = async (e, queries, numImages, match_first, ModelSelect, setSearchResult, setSearchMode) => {
+export const handleKeyPressTemporal = async (e, queries, numImages, match_first, TemporalMetric, QueryLanguage, ModelSelect, setSearchResult, setSearchMode) => {
   if (e.key === 'Enter') {
 
 
     const toastId = toast.loading("Sending request...");
 
     try {
-      const response = await temporalservice.sendTemporalRequest(queries, numImages, match_first, ModelSelect);
+      const response = await temporalservice.sendTemporalRequest(queries, numImages, QueryLanguage, match_first, TemporalMetric, ModelSelect);
 
       toast.update(toastId, {
         render: "Request successful!",
@@ -266,6 +267,21 @@ export const handleKeyPressTemporal = async (e, queries, numImages, match_first,
         isLoading: false,
         autoClose: 3000
       });
+    }
+  }
+};
+
+
+
+export const handleKeyPressTranslate = async (e, queries, setTranslateResult) => {
+  if (e.key === 'Enter') {
+    try {
+      const response = await transalteservice.sendTranslateRequest(queries);
+      setTranslateResult(response.data.texts);
+      return response.data.texts
+    } catch (error) {
+      console.log(error);
+
     }
   }
 };

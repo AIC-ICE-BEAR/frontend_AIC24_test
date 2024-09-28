@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Switch from "react-switch";
 import { handleKeyPressTemporal } from "../utils/ServicesUtils";
+import { handleKeyPressTranslate } from '../utils/ServicesUtils'
 import { useSearchResult } from '../../contexts/ClipsearchContext';
 import { useModeContext } from '../../contexts/searchModeContext';
 import { useClipConfig } from '../../contexts/ClipSearchConfigContext';
@@ -14,13 +15,27 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
 
     const [ModelSelect, setModelSelect] = useState('ViT-bigG-2B');
     const [Textquery, setTextquery] = useState('');
+
     const [textquerylist, settextquerylist] = useState(['']); // Initialize with primary Textquery
     const [isModeSwitchChecked, setisModeSwitchChecked] = useState(false);
     const [TemporalMode, setTemporalMode] = useState(true);
+    const [TemporalMetric, setTemporalMetric] = useState("exp_dot");
 
-
+    const [QueryLanguage, setQueryLanguage] = useState('en');
+    const [TranslateResult, setTranslateResult] = useState([])
+    const [isLanguageSwitchChecked, setIsLanguageSwitchChecked] = useState(false);
     // if true then search for a sequence that start with that frame 
     // if false then search for a sequence that end with that frame 
+
+
+    const handleLanguageSwitch = (checked) => {
+        setIsLanguageSwitchChecked(checked);
+        setQueryLanguage(checked ? "vi" : "en");
+    };
+
+
+
+
     const handleModeSwitch = (checked) => {
         setisModeSwitchChecked(checked);
         setTemporalMode(checked ? true : false);
@@ -60,7 +75,6 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
         console.log("Clip config", ClipConfig);
     }, [ModelSelect, numImages]);
 
-
     const addQueryBox = () => {
         settextquerylist([...textquerylist, '']); // Add new empty query box
     };
@@ -76,35 +90,42 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
     return (
         <div className="p-4 border-b ">
             <div className="query-controls mb-5">
-                <p>TEXT</p>
-                <div className="flex justify-center gap-8">
-                    <div>
-                        <label>ViT-bigG-2B</label>
-                        <input
-                            type="radio"
-                            value="ViT-bigG-2B"
-                            checked={ModelSelect === 'ViT-bigG-2B'}
+                <p className="pb-4">TEMPORAL</p>
+                <div className="query-controls mb-5">
+                    Model select
+                    <div className="flex justify-center gap-8">
+
+                        <select
+                            id="modelSelect"
+                            value={ModelSelect}
                             onChange={(e) => setModelSelect(e.target.value)}
-                        />
+                            className="border border-gray-300 rounded p-4 text-sm"
+                        >
+                            <option value="ViT-bigG-2B">ViT-bigG-2B</option>
+                            <option value="ViT 5b">ViT 5b</option>
+                            <option value="Clip-400M">Clip-400M</option>
+                        </select>
                     </div>
-                    <div>
-                        <label>ViT 5b</label>
-                        <input
-                            type="radio"
-                            value="ViT 5b"
-                            checked={ModelSelect === 'ViT 5b'}
-                            onChange={(e) => setModelSelect(e.target.value)}
-                        />
+                    Select metric
+
+                    <div className="flex justify-center gap-8">
+
+                        <select
+                            id="metrci select"
+                            value={TemporalMetric}
+                            onChange={(e) => setTemporalMetric(e.target.value)}
+                            className="border border-gray-300 rounded p-4 text-sm"
+                        >
+                            <option value="dot">dot</option>
+                            <option value="exp_dot">exp_dot</option>
+                            <option value="taylor_exp_dot">taylor_exp_dot</option>
+                        </select>
                     </div>
-                    <div>
-                        <label>Clip-400M</label>
-                        <input
-                            type="radio"
-                            value="Clip-400M"
-                            checked={ModelSelect === 'Clip-400M'}
-                            onChange={(e) => setModelSelect(e.target.value)}
-                        />
-                    </div>
+                </div>
+
+                <div className="flex items-center justify-center my-4 gap-2">
+                    <label>Translate</label>
+                    <Switch onChange={handleLanguageSwitch} checked={isLanguageSwitchChecked} />
                 </div>
 
 
@@ -115,6 +136,21 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                     <label>Results at End frame</label>
                 </div>
 
+                {TranslateResult.map((translatedQuery, index) => (
+                    <div>
+                        query {index}
+                        <textarea
+                            className="shadow appearance-none border-2 rounded w-full py-2 px-3 flex-grow"
+                            value={translatedQuery}
+
+                            rows="1"
+                            style={{ height: 'auto' }}
+                        />
+                    </div>
+                ))}
+
+
+                Enter here
                 {textquerylist.map((query, index) => (
                     <div key={index} className="flex items-start gap-2 mb-2">
                         <textarea
@@ -122,12 +158,22 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                             placeholder={`${index === 0 ? "Describe then scene" : "Describe what happens next"} `}
                             value={query}
                             onChange={(e) => handleChangeMultiQuery(index, e.target.value)}
-                            onKeyPress={(e) => {
+                            onKeyPress={async (e) => {
                                 // Clean text before handling key press
-                                const cleanedText = query.trim().replace(/\s+/g, ' ');
 
 
-                                handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMode, ModelSelect, setTemporalResult, setSearchMode);
+                                if (QueryLanguage == "vi") {
+                                    if (e.key === 'Enter') {
+                                        const Translated = await handleKeyPressTranslate(e, textquerylist, setTranslateResult);
+
+
+                                        handleKeyPressTemporal(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMode, TemporalMetric, QueryLanguage, ModelSelect, setTemporalResult, setSearchMode);
+                                    }
+                                }
+                                else {
+
+                                    handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMode, TemporalMetric, QueryLanguage, ModelSelect, setTemporalResult, setSearchMode);
+                                }
                                 setClipConfig(ModelSelect + "#" + numImages);
 
                             }}

@@ -7,16 +7,16 @@ import { useVQASearchImage } from '../contexts/VQAImageContext'
 import { useASRSearchResult } from '../contexts/ASRsearchContext';
 import { useModeContext } from '../contexts/searchModeContext';
 import { useClipConfig } from '../contexts/ClipSearchConfigContext';
+import { useCSVPreview } from '../contexts/CSVPreviewContext'
 import { useVQASearchResult } from '../contexts/VQAContext';
 import { useSubmitContext } from '../contexts/SubmitImageContext';
 import { handleClickImgSim } from './utils/ServicesUtils'
 import renderNextImagesForm from './RenderForms/NextImages'
 import renderImagesSimilarityForm from './RenderForms/ImgSimilarity'
 import { VideoModal } from './RenderForms/VideoForm'
-import { mapKeyframe, createCSV } from './utils/utils'
-import { FaLink } from "react-icons/fa";
-import { BiSolidLike } from "react-icons/bi";
-import { BiSolidDislike } from "react-icons/bi";
+import { mapKeyframe, createCSV, findImageFromFrameIdx } from './utils/utils'
+import { FaSearch } from "react-icons/fa";
+import { GiPlayButton } from "react-icons/gi";
 import { useFeedbackImage } from '../contexts/ImagesFeedBack'
 
 
@@ -64,7 +64,11 @@ function DisplayResult({ style }) {
   const [selectedImage, setselectgedImage] = useState();
   const [selectedVideo, setSelectedVideo] = useState({ video_name: "", frame_idx: 0 });
   const { ClipConfig } = useClipConfig();
-  const [submittedImages, setsubmittedImages] = useState([])
+  const { submittedImages, setsubmittedImages } = useCSVPreview()
+
+  // For image visualization 
+  const [videoName, setvideoName] = useState('')
+  const [frameIdx, setframeIdx] = useState('')
 
 
   // For image submission
@@ -210,7 +214,7 @@ function DisplayResult({ style }) {
       .then(result => {
         console.log("mapped keyframe", result);
         submittedImages.push({ text: `${result.videoName.split('/').pop()}, ${result.frameIdx}`, image: splits[1] })
-        console.log(submittedImages)
+
         setSubmission(result)
       })
       .catch(error => {
@@ -231,6 +235,27 @@ function DisplayResult({ style }) {
 
     setSelectedVideo({ video_name, frame_idx });
     setwatchVideoformVisible(true);
+  };
+
+  const getkeyframe = async (videoName, imageId) => {
+    const result = await mapKeyframe(videoName, imageId);
+
+    return result.frameIdx
+  }
+
+
+  const handleVisualizeImage = async (video_name, frame_idx) => {
+    try {
+      const { videoName: vName, imageId } = await findImageFromFrameIdx(video_name, frame_idx);
+
+      // Assuming your image URL is structured like this (modify if needed)
+      const imageURL = `${process.env.REACT_APP_IMAGE_PATH}/${vName}/${imageId}.jpg`;
+
+      // Open the image in a new tab/window
+      window.open(imageURL, '_blank');
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
   };
 
   return (
@@ -254,6 +279,43 @@ function DisplayResult({ style }) {
             {renderImagesSimilarityForm(ImageSimiResult, setImageSimformVisible, selectedImage, handleImageClick, handleDoubleClick, handleClickImgSim, ClipConfig, setImageSimiResult, handlePlayVideoClick)}
           </div>
         )}
+
+        <div className='flex pb-10 w-1/2 items-center'>
+          <p className='w-full px-2 py-2'>Visualize image</p>
+
+          <input
+            className="shadow appearance-none border-2 rounded w-full py-2 px-2 flex-grow"
+            placeholder={`Enter video name`}
+            value={videoName}
+            onChange={(e) => setvideoName(e.target.value)}
+          />
+
+          <input
+            className="shadow appearance-none border-2 rounded w-full py-2 px-2 flex-grow"
+            placeholder={`Enter Frameidx`}
+            value={frameIdx}
+            onChange={(e) => setframeIdx(e.target.value)}
+          />
+          <div className='flex '>
+            <button
+              className="mt-4 py-2 px-2 bg-blue-500 text-white rounded"
+              onClick={() => handleVisualizeImage(videoName, frameIdx)}
+            >
+              <FaSearch />
+            </button>
+
+            <button
+              className="mt-4 py-2 px-2 bg-blue-500 text-white rounded"
+
+              onClick={async () => {
+                const keyframe = await findImageFromFrameIdx(videoName, frameIdx)
+                handlePlayVideoClick(videoName, keyframe.imageId)
+              }}
+            >
+              <GiPlayButton />
+            </button>
+          </div>
+        </div>
 
         <CSVPreview
           searchMode={searchMode}
@@ -281,6 +343,7 @@ function DisplayResult({ style }) {
             ClipConfig={ClipConfig}
             setImageSimiResult={setImageSimiResult}
             setImageSimformVisible={setImageSimformVisible}
+            getkeyframe={getkeyframe}
           />
         )}
 
@@ -299,7 +362,7 @@ function DisplayResult({ style }) {
             ClipConfig={ClipConfig}
             setImageSimiResult={setImageSimiResult}
             setImageSimformVisible={setImageSimformVisible}
-
+            getkeyframe={getkeyframe}
           />
         )}
 
@@ -319,6 +382,7 @@ function DisplayResult({ style }) {
             ClipConfig={ClipConfig}
             setImageSimiResult={setImageSimiResult}
             setImageSimformVisible={setImageSimformVisible}
+            getkeyframe={getkeyframe}
           />
         )}
 

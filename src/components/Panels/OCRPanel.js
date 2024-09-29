@@ -32,6 +32,11 @@ const OCRPanel = ({ numImages, setNumImages }) => {
           <Switch onChange={handlemodeSwitch} checked={isOCRModeSwitchChecked} />
           <label>elastic</label>
         </div>
+
+        {/* <div className="flex items-center justify-center my-4 gap-2">
+          <label>Translate</label>
+          <Switch />
+        </div> */}
         <textarea
           className="shadow w-full appearance-none border-2 rounded  py-2 px-3"
           placeholder="Fill query and press enter"

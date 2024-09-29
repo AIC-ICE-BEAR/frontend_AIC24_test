@@ -62,33 +62,20 @@ const VQAPanel = ({ numImages, setNumImages }) => {
             <p>VQA</p>
 
             {/* Model Selection */}
-            <div className="flex justify-center gap-8">
-                <div>
-                    <label>ViT-bigG-2B</label>
-                    <input
-                        type="radio"
-                        value="ViT-bigG-2B"
-                        checked={ModelSelect === 'ViT-bigG-2B'}
+            <div className="query-controls mb-5">
+
+                <div className="flex justify-center gap-8">
+
+                    <select
+                        id="modelSelect"
+                        value={ModelSelect}
                         onChange={(e) => setModelSelect(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label>ViT 5b</label>
-                    <input
-                        type="radio"
-                        value="ViT 5b"
-                        checked={ModelSelect === 'ViT 5b'}
-                        onChange={(e) => setModelSelect(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label>Clip-400M</label>
-                    <input
-                        type="radio"
-                        value="Clip-400M"
-                        checked={ModelSelect === 'Clip-400M'}
-                        onChange={(e) => setModelSelect(e.target.value)}
-                    />
+                        className="border border-gray-300 rounded p-4 text-sm"
+                    >
+                        <option value="ViT-bigG-2B">ViT-bigG-2B</option>
+                        <option value="ViT 5b">ViT 5b</option>
+                        <option value="Clip-400M">Clip-400M</option>
+                    </select>
                 </div>
             </div>
 

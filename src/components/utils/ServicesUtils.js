@@ -6,6 +6,7 @@ import ASRservice from '../../services/ASRservice';
 import OBDetservice from '../../services/OBDetservice';
 import ImgSimiLarservice from '../../services/ImageSimiService'
 import fusedservice from '../../services/FusedSearchService'
+import transalteservice from '../../services/TranslateService'
 import ObjectColorservice from '../../services/ObjectColorService'
 import temporalservice from '../../services/TemporalService'
 
@@ -139,34 +140,84 @@ export const handleKeyPressOBDet = async (e, OBDetquery, numImages, ObtDetMode, 
 // handleKeyPressOBDet function
 export const handleKeyPressOBJCOLOR = async (e, droppedItems, numImages, setOBDetResult, setSearchMode) => {
   if (e.key === 'Enter') {
-    console.log("send request OBdet");
+    console.log("send request OB color");
 
     const toastId = toast.loading("Sending request...");
-    console.log("dropped items", { 'Items': droppedItems, 'k': numImages })
+    console.log(droppedItems)
+    const canvasWidth = droppedItems[0].objectDetection.canvasSize.width;
+    const canvasHeight = droppedItems[0].objectDetection.canvasSize.height;
 
-    // try {
-    //   const response = await ObjectColorservice.sendObjectColorRequest(OBDetquery, numImages);
+    // Helper function to normalize coordinates
+    const normalizeCoord = (value, max) => value / max;
 
-    //   toast.update(toastId, {
-    //     render: "Request successful!",
-    //     type: 'success',
-    //     isLoading: false,
-    //     autoClose: 3000
-    //   });
+    const objectLocationQuery = {
+      class_ids: [],
+      box_cords: [],
+      topk: numImages
+    };
 
-    //   setOBDetResult(response.data.results);
-    //   setSearchMode('text');
-    // } catch (error) {
-    //   console.log(error);
-    //   toast.update(toastId, {
-    //     render: `Error: ${error.message || 'Failed'}`,
-    //     type: 'error',
-    //     isLoading: false,
-    //     autoClose: 3000
-    //   });
-    // }
+    // Loop over dropped items and extract the required information
+    droppedItems.forEach(item => {
+      const { label, objectDetection } = item;
+
+      // Ensure objectDetection and item.id are valid
+      if (!objectDetection || typeof item.id === 'undefined' || isNaN(parseInt(item.id))) {
+        console.warn('Invalid item or missing id:', item);
+        return; // Skip invalid items
+      }
+
+      // Normalize top left and bottom right coordinates
+      const topLeft = objectDetection.topLeft;
+      const bottomRight = objectDetection.bottomRight;
+
+      const normalizedTopLeftX = normalizeCoord(topLeft.x, canvasWidth);
+      const normalizedTopLeftY = normalizeCoord(topLeft.y, canvasHeight);
+
+      const normalizedBottomRightX = normalizeCoord(bottomRight.x, canvasWidth);
+      const normalizedBottomRightY = normalizeCoord(bottomRight.y, canvasHeight);
+
+      // Push class id
+      objectLocationQuery.class_ids.push(parseInt(item.id));
+
+      // Push normalized box coordinates
+      objectLocationQuery.box_cords.push([
+        normalizedTopLeftX,
+        normalizedTopLeftY,
+        normalizedBottomRightX,
+        normalizedBottomRightY
+      ]);
+    });
+
+
+    console.log("ObjectLocationQuery:", objectLocationQuery);
+
+
+    try {
+      const response = await ObjectColorservice.sendObjectColorRequest(objectLocationQuery, numImages);
+
+      console.log("Object color", response)
+
+      toast.update(toastId, {
+        render: "Request successful!",
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+      setOBDetResult(response.data.results);
+      setSearchMode('text');
+    } catch (error) {
+      console.log(error);
+      toast.update(toastId, {
+        render: `Error: ${error.message || 'Failed'}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+    }
   }
-};
+}
+  ;
 
 
 
@@ -240,14 +291,14 @@ export const handleKeyPressFused = async (e, queries, numImages, ModelSelect, se
   }
 };
 
-export const handleKeyPressTemporal = async (e, queries, numImages, match_first, ModelSelect, setSearchResult, setSearchMode) => {
+export const handleKeyPressTemporal = async (e, queries, numImages, TemporalMetric, ModelSelect, setSearchResult, setSearchMode) => {
   if (e.key === 'Enter') {
 
 
     const toastId = toast.loading("Sending request...");
 
     try {
-      const response = await temporalservice.sendTemporalRequest(queries, numImages, match_first, ModelSelect);
+      const response = await temporalservice.sendTemporalRequest(queries, numImages, TemporalMetric, ModelSelect);
 
       toast.update(toastId, {
         render: "Request successful!",
@@ -266,6 +317,21 @@ export const handleKeyPressTemporal = async (e, queries, numImages, match_first,
         isLoading: false,
         autoClose: 3000
       });
+    }
+  }
+};
+
+
+
+export const handleKeyPressTranslate = async (e, queries, setTranslateResult) => {
+  if (e.key === 'Enter') {
+    try {
+      const response = await transalteservice.sendTranslateRequest(queries);
+      setTranslateResult(response.data.texts);
+      return response.data.texts
+    } catch (error) {
+      console.log(error);
+
     }
   }
 };

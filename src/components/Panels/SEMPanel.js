@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Switch from "react-switch";
 import { handleKeyPressCLIP } from "../utils/ServicesUtils";
 import { handleKeyPressFused } from "../utils/ServicesUtils";
+import { handleKeyPressTranslate } from '../utils/ServicesUtils'
 import { useSearchResult } from '../../contexts/ClipsearchContext';
 import { useModeContext } from '../../contexts/searchModeContext';
 import { useClipConfig } from '../../contexts/ClipSearchConfigContext';
@@ -14,32 +15,17 @@ const SEMPanel = ({ numImages, setNumImages }) => {
 
   const [ModelSelect, setModelSelect] = useState('ViT-bigG-2B');
   const [Textquery, setTextquery] = useState('');
+  const [TranslateResult, setTranslateResult] = useState([])
   const [textquerylist, settextquerylist] = useState(['']); // Initialize with primary Textquery
   const [QueryLanguage, setQueryLanguage] = useState('Eng');
   const [isLanguageSwitchChecked, setIsLanguageSwitchChecked] = useState(false);
   const { FBImage, setFBImage } = useFeedbackImage();
 
+
+
   const handleLanguageSwitch = (checked) => {
     setIsLanguageSwitchChecked(checked);
     setQueryLanguage(checked ? "Vie" : "Eng");
-  };
-
-  const handleChange = (e) => {
-    const newValue = e.target.value;
-    setTextquery(newValue);
-    autoResize(e);
-    updateFirstTextQueryList(newValue); // Synchronize the first query
-  };
-
-  const autoResize = (e) => {
-    e.target.style.height = 'auto';
-    e.target.style.height = `${e.target.scrollHeight}px`;
-  };
-
-  const updateFirstTextQueryList = (newValue) => {
-    const newTextQueryList = [...textquerylist];
-    newTextQueryList[0] = newValue; // Update the first entry in the list
-    settextquerylist(newTextQueryList);
   };
 
   const handleChangeMultiQuery = (index, value) => {
@@ -68,11 +54,6 @@ const SEMPanel = ({ numImages, setNumImages }) => {
 
   }, [ModelSelect, numImages]);
 
-  const handleMuliQueryPress = (e, query) => {
-    // Clean the query before handling key press
-    const cleanedQuery = query.trim().replace(/\s+/g, ' ');
-    handleKeyPressCLIP(e, cleanedQuery, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
-  };
 
   const addQueryBox = () => {
     settextquerylist([...textquerylist, '']); // Add new empty query box
@@ -86,44 +67,37 @@ const SEMPanel = ({ numImages, setNumImages }) => {
     settextquerylist(newTextQueryList);
   };
 
+  const handleRemoveTranslate = (index) => {
+
+    const newTranslateResult = TranslateResult.filter((_, i) => i !== index);
+    setTranslateResult(newTranslateResult);
+  };
+
   return (
-    <div className="p-4 border-b ">
+    <div className="p-4 border-b w-80 max-h-full overflow-y-auto">
       <div className="query-controls mb-5">
         <p>TEXT</p>
-        <div className="flex justify-center gap-8">
-          <div>
-            <label>ViT-bigG-2B</label>
-            <input
-              type="radio"
-              value="ViT-bigG-2B"
-              checked={ModelSelect === 'ViT-bigG-2B'}
+        <div className="query-controls mb-5">
+
+          <div className="flex flex-col pt-5 justify-center gap-2">
+            <p>Model select</p>
+            <select
+              id="modelSelect"
+              value={ModelSelect}
               onChange={(e) => setModelSelect(e.target.value)}
-            />
-          </div>
-          <div>
-            <label>ViT 5b</label>
-            <input
-              type="radio"
-              value="ViT 5b"
-              checked={ModelSelect === 'ViT 5b'}
-              onChange={(e) => setModelSelect(e.target.value)}
-            />
-          </div>
-          <div>
-            <label>Clip-400M</label>
-            <input
-              type="radio"
-              value="Clip-400M"
-              checked={ModelSelect === 'Clip-400M'}
-              onChange={(e) => setModelSelect(e.target.value)}
-            />
+              className="border border-black rounded p-4 text-sm"
+            >
+              <option value="ViT-bigG-2B">ViT-bigG-2B</option>
+              <option value="ViT 5b">ViT 5b</option>
+              <option value="Clip-400M">Clip-400M</option>
+            </select>
           </div>
         </div>
+
         {/* For VBS */}
         <div className="flex items-center justify-center my-4 gap-2">
           <label>Translate</label>
           <Switch onChange={handleLanguageSwitch} checked={isLanguageSwitchChecked} />
-          <label></label>
         </div>
 
         {/* <div className="flex items-center justify-center my-4 gap-2">
@@ -131,6 +105,27 @@ const SEMPanel = ({ numImages, setNumImages }) => {
           <Switch onChange={handleLanguageSwitch} checked={isLanguageSwitchChecked} />
           <label>Vie</label>
         </div> */}
+        {TranslateResult.map((translatedQuery, index) => (
+          <div>
+            query {index}
+            <textarea
+              className="shadow appearance-none border-2 rounded w-full py-2 px-3 flex-grow"
+              value={translatedQuery}
+
+              rows="1"
+              style={{ height: 'auto' }}
+            />
+
+            <button
+              onClick={() => handleRemoveTranslate(index)}
+              className="ml-2 px-2 py-1 bg-red-500 text-white rounded"
+            >
+              -
+            </button>
+          </div>
+        ))}
+
+        <p className="p-5">Enter here</p>
 
         {textquerylist.map((query, index) => (
           <div key={index} className="flex items-start gap-2 mb-2">
@@ -139,15 +134,32 @@ const SEMPanel = ({ numImages, setNumImages }) => {
               placeholder={`${index === 0 ? "Describe then scene" : "Describe what happens next"} `}
               value={query}
               onChange={(e) => handleChangeMultiQuery(index, e.target.value)}
-              onKeyPress={(e) => {
+              onKeyPress={async (e) => {
                 // Clean text before handling key press
                 const cleanedText = query.trim().replace(/\s+/g, ' ');
 
                 if (textquerylist.length > 1) {
-                  handleKeyPressFused(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode);
+                  if (QueryLanguage == "Vie") {
+                    if (e.key === 'Enter') {
+                      const Translated = await handleKeyPressTranslate(e, textquerylist, setTranslateResult);
+
+                      console.log(Translated)
+                      handleKeyPressFused(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode);
+                    }
+                  }
+                  else {
+
+                    handleKeyPressFused(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode);
+                  }
+
+
+
                   setClipConfig(ModelSelect + "#" + numImages);
                 } else {
                   handleKeyPressCLIP(e, cleanedText, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
+                  if (QueryLanguage == "Vie") {
+                    handleKeyPressTranslate(e, [cleanedText], setTranslateResult)
+                  }
                   setClipConfig(ModelSelect + "#" + numImages);
                 }
               }}

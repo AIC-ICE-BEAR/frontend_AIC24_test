@@ -7,14 +7,13 @@ class TemporalService {
         });
     }
 
-    async sendTemporalRequest(queries, numImages, match_first, model) {
+    async sendTemporalRequest(queries, numImages, TemporalMetric, model) {
         try {
             const response = await this.axiosInstance.post('/temporal_search', {
                 "query": queries,
                 "topk": numImages,
                 "model": model,
-                "match_first": match_first
-
+                "metric": TemporalMetric
             });
             console.log("Temporal search", response.data)
             return { data: response.data, status: response.status };

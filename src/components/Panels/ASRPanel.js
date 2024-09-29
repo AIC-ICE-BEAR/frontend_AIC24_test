@@ -32,6 +32,11 @@ const ASRPanel = ({ numImages, setNumImages }) => {
                     <label>Faster results</label>
                 </div>
 
+                {/* <div className="flex items-center justify-center my-4 gap-2">
+                    <label>Translate</label>
+                    <Switch />
+                </div> */}
+
 
                 <textarea
                     className="shadow appearance-none border-2 rounded w-full py-2 px-3"

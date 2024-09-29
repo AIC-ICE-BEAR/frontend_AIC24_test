@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaLink } from 'react-icons/fa';
 function ASRSearchResult({
     displayResult,
@@ -11,8 +11,32 @@ function ASRSearchResult({
     handleOpenImageInNewTab,
     ClipConfig,
     setImageSimiResult,
-    setImageSimformVisible
+    setImageSimformVisible,
+    getkeyframe
 }) {
+
+    const [frameIndices, setFrameIndices] = useState({});
+
+    // Effect to fetch keyframes for each image when the component mounts
+    useEffect(() => {
+        const fetchAllKeyframes = async () => {
+            const indices = {};
+            console.log(displayResult)
+            for (const item of displayResult) {
+                for (const key_id of item.keyframe_id) {
+                    try {
+                        const index = await getkeyframe(item.video_name, key_id);
+                        indices[`${item.video_name}-${key_id}`] = index; // Store index using a unique key
+                    } catch (error) {
+                        console.error("Error fetching keyframe:", error);
+                    }
+                }
+            }
+            setFrameIndices(indices); // Update state with all frame indices
+        };
+
+        fetchAllKeyframes(); // Call the fetch function
+    }, [displayResult, getkeyframe]);
     return (
         <div className="overflow-y-auto h-screen">
             {displayResult.map((item, index) => (
@@ -55,7 +79,11 @@ function ASRSearchResult({
                                 </div>
 
                                 {/* Display the image name */}
+
                                 {item.video_name} {key_id}.jpg
+                                {frameIndices[`${item.video_name}-${key_id}`] !== undefined && (
+                                    <span>  {frameIndices[`${item.video_name}-${key_id}`]}</span>
+                                )}
                             </div>
                         ))}
                     </div>

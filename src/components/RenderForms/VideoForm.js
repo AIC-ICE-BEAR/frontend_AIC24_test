@@ -9,20 +9,17 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
   const videoRef = useRef(null);
   const progressBarRef = useRef(null);
   const [startTime, setStartTime] = useState(0);
-  const [hoverTime, setHoverTime] = useState(null); // Hover time for preview
-  const [previewImage, setPreviewImage] = useState(null); // Preview image
+  const [hoverTime, setHoverTime] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   const [imageFrames, setImageFrames] = useState([]);
   const [preloadedImages, setPreloadedImages] = useState([]);
-  const [videoFPS, setvideoFPS] = useState(25);
+  const [videoFPS, setVideoFPS] = useState(25);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const { submittedImages, setsubmittedImages } = useCSVPreview()
-
+  const { submittedImages, setsubmittedImages } = useCSVPreview();
 
   const handleOpenImageInNewTab = (video_name) => {
-
     const videoUrl = `${video_name.includes('_a') ? `${process.env.REACT_APP_VIDEO_PATH}/${video_name}.mp4`
       : `${process.env.REACT_APP_VIDEO_PATH}/${video_name}_480p.mp4`}`;
-
     window.open(videoUrl, '_blank');
   };
 
@@ -40,7 +37,6 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
 
   useEffect(() => {
     const video = videoRef.current;
-
     const handleLoadedMetadata = () => {
       if (startTime && video) {
         video.currentTime = startTime;
@@ -68,10 +64,8 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
       try {
         const imageList = await getImageListFromCSV(videoUrl);
         const updatedImageList = imageList.slice(0, -1); // Remove the last image if needed
-
         setImageFrames(updatedImageList);
 
-        // Pre-map the images to corresponding time ranges based on the video duration
         if (videoRef.current) {
           const videoDuration = videoRef.current.duration;
           const mappedImages = updatedImageList.map((frame, index) => {
@@ -81,7 +75,7 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
             return {
               frame,
               startTime: frameTime,
-              endTime: nextFrameTime
+              endTime: nextFrameTime,
             };
           });
 
@@ -97,8 +91,15 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
     }
   }, [videoUrl]);
 
+  // Preload images when the component mounts
+  useEffect(() => {
+    imageFrames.forEach((image) => {
+      const img = new Image();
+      img.src = image.imageUrl;
+    });
+  }, [imageFrames]);
+
   const getPreloadedImage = (hoverTime) => {
-    // Find the image that corresponds to the hoverTime
     const preloadedImage = preloadedImages.find(
       (image) => hoverTime >= image.startTime && hoverTime <= image.endTime
     );
@@ -117,20 +118,16 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
     }
   };
 
-  // Helper function to find the closest image based on the hover time
   const findClosestImage = (hoverTime) => {
     if (imageFrames.length === 0) return null;
-
     let low = 0;
     let high = imageFrames.length - 1;
-
-    // Perform binary search
     while (low <= high) {
       const mid = Math.floor((low + high) / 2);
       const midTime = imageFrames[mid].time;
 
       if (midTime === hoverTime) {
-        return imageFrames[mid]; // Exact match
+        return imageFrames[mid];
       } else if (midTime < hoverTime) {
         low = mid + 1;
       } else {
@@ -138,7 +135,6 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
       }
     }
 
-    // After binary search, check which of the two closest times is better
     const closest = (low < imageFrames.length && high >= 0)
       ? (Math.abs(imageFrames[low]?.time - hoverTime) < Math.abs(imageFrames[high]?.time - hoverTime) ? imageFrames[low] : imageFrames[high])
       : imageFrames[low] || imageFrames[high];
@@ -146,22 +142,15 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
     return closest;
   };
 
-
-  // Handle mouse movement on progress bar
   const handleMouseMove = (e) => {
     const rect = progressBarRef.current.getBoundingClientRect();
     const hoverPosX = e.clientX - rect.left;
     const percentage = hoverPosX / rect.width;
     const hoverTime = videoRef.current.duration * percentage;
 
-    // Update hover time state
     setHoverTime(hoverTime);
-
-    // Get the preloaded image directly based on hover time
     const preloadedImage = getPreloadedImage(hoverTime);
-    setPreviewImage(preloadedImage); // Update the preview image
-
-    // Update mouse position state
+    setPreviewImage(preloadedImage);
     setMousePosition({ x: e.clientX, y: e.clientY });
   };
 
@@ -170,42 +159,34 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
     setPreviewImage(null);
   };
 
-  // Handle clicking on the progress bar to seek to the clicked position
   const handleProgressBarClick = (e) => {
     try {
       const rect = progressBarRef.current.getBoundingClientRect();
       const clickPosX = e.clientX - rect.left;
       const percentage = clickPosX / rect.width;
       const clickedTime = videoRef.current.duration * percentage;
-
-      // Seek the video to the clicked time
       videoRef.current.currentTime = clickedTime;
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error:', error.message);
     }
   };
 
-  // Get current time of the video
   const getCurrentTime = () => {
     const currentTime = videoRef.current.currentTime;
-    const frame = Math.floor(currentTime * videoFPS)
-
+    const frame = Math.floor(currentTime * videoFPS);
     const closestImage = findClosestImage(currentTime);
-    submittedImages.push({ text: `${videoUrl.split('/').pop()}, ${frame}`, image: closestImage.imageUrl.split('/').pop().slice(0, -4) })
-
+    submittedImages.push({ text: `${videoUrl.split('/').pop()}, ${frame}`, image: closestImage.imageUrl.split('/').pop().slice(0, -4) });
   };
 
   return (
     <div className="relative w-fit">
-
       <video
         ref={videoRef}
         controls
         width="600"
         autoPlay
         muted
-        controlsList="nodownload"  // Prevents download button
+        controlsList="nodownload"
         style={{ '--moz-media-controls-timeline': 'none' }}
       >
         <source
@@ -219,13 +200,17 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
         Your browser does not support the video tag.
       </video>
 
+      {/* Preload images but keep them hidden */}
+      <div className="hidden">
+        {imageFrames.map((image) => (
+          <img key={image.imageUrl} src={image.imageUrl} alt="" />
+        ))}
+      </div>
 
       <div className="absolute top-0 left-0 pointer-events-none flex justify-start items-center px-4">
         <button
           className="p-4 bg-transparent text-gray-300 rounded hover:text-gray-300 opacity-75 pointer-events-auto"
-          onClick={() => {
-            handleOpenImageInNewTab(videoUrl);
-          }}
+          onClick={() => handleOpenImageInNewTab(videoUrl)}
           alt="direct-link"
         >
           <FaLink size={30} />
@@ -256,7 +241,6 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
         onClick={handleProgressBarClick}
         style={{ cursor: "pointer" }}
       >
-        {/* Progress bar itself */}
         <div
           className="absolute left-0 top-0 h-full bg-red-500"
           style={{
@@ -265,8 +249,6 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
               : 0)}%`,
           }}
         />
-
-        {/* Preview image */}
         {previewImage && hoverTime && (
           <div
             className="fixed bg-black text-white p-2"
@@ -279,7 +261,6 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
           >
             <img src={previewImage.imageUrl} alt="Preview" width="160" height="90" />
             <span>{Math.floor(hoverTime)}s</span>
-            {/* <span>{previewImage.imageUrl}</span> */}
           </div>
         )}
       </div>
@@ -289,7 +270,6 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
       >
         <FaPaperPlane />
       </button>
-
     </div>
   );
 };

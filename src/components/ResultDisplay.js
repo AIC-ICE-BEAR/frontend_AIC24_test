@@ -279,7 +279,7 @@ function DisplayResult({ style }) {
           </div>
         )}
 
-        <div className='flex pb-10 w-1/2 items-center'>
+        {/* <div className='flex pb-10 w-1/2 items-center'>
           <p className='w-full px-2 py-2'>Visualize image</p>
 
           <input
@@ -314,14 +314,14 @@ function DisplayResult({ style }) {
               <GiPlayButton />
             </button>
           </div>
-        </div>
+        </div> */}
 
-        <CSVPreview
+        {/* <CSVPreview
           searchMode={searchMode}
           displayResult={displayResult}
           handleSubmissionRefresh={handleSubmissionRefresh}
           createCSV={createCSV}
-        />
+        /> */}
 
 
 

@@ -291,14 +291,14 @@ export const handleKeyPressFused = async (e, queries, numImages, ModelSelect, se
   }
 };
 
-export const handleKeyPressTemporal = async (e, queries, numImages, match_first, TemporalMetric, ModelSelect, setSearchResult, setSearchMode) => {
+export const handleKeyPressTemporal = async (e, queries, numImages, TemporalMetric, ModelSelect, setSearchResult, setSearchMode) => {
   if (e.key === 'Enter') {
 
 
     const toastId = toast.loading("Sending request...");
 
     try {
-      const response = await temporalservice.sendTemporalRequest(queries, numImages, match_first, TemporalMetric, ModelSelect);
+      const response = await temporalservice.sendTemporalRequest(queries, numImages, TemporalMetric, ModelSelect);
 
       toast.update(toastId, {
         render: "Request successful!",

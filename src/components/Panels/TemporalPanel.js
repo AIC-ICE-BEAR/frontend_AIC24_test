@@ -18,7 +18,6 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
 
     const [textquerylist, settextquerylist] = useState(['']); // Initialize with primary Textquery
     const [isModeSwitchChecked, setisModeSwitchChecked] = useState(false);
-    const [TemporalMode, setTemporalMode] = useState(true);
     const [TemporalMetric, setTemporalMetric] = useState("exp_dot");
 
     const [QueryLanguage, setQueryLanguage] = useState('en');
@@ -36,10 +35,6 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
 
 
 
-    const handleModeSwitch = (checked) => {
-        setisModeSwitchChecked(checked);
-        setTemporalMode(checked ? true : false);
-    };
 
     const handleChange = (e) => {
         const newValue = e.target.value;
@@ -137,12 +132,6 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
 
 
 
-                <div className="flex items-center justify-center my-4 gap-2">
-                    <label>Results at Start frame</label>
-                    <Switch onChange={handleModeSwitch} checked={isModeSwitchChecked} />
-                    <label>Results at End frame</label>
-                </div>
-
                 {TranslateResult.map((translatedQuery, index) => (
                     <div >
                         query {index}
@@ -175,19 +164,15 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                             onChange={(e) => handleChangeMultiQuery(index, e.target.value)}
                             onKeyPress={async (e) => {
                                 // Clean text before handling key press
-
-
                                 if (QueryLanguage == "vi") {
                                     if (e.key === 'Enter') {
                                         const Translated = await handleKeyPressTranslate(e, textquerylist, setTranslateResult);
-
-
-                                        handleKeyPressTemporal(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMode, TemporalMetric, ModelSelect, setTemporalResult, setSearchMode);
+                                        handleKeyPressTemporal(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMetric, ModelSelect, setTemporalResult, setSearchMode);
                                     }
                                 }
                                 else {
 
-                                    handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMode, TemporalMetric, ModelSelect, setTemporalResult, setSearchMode);
+                                    handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMetric, ModelSelect, setTemporalResult, setSearchMode);
                                 }
                                 setClipConfig(ModelSelect + "#" + numImages);
 

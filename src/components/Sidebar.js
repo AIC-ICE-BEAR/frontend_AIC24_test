@@ -43,7 +43,9 @@ const SidebarApp = () => {
             onClick={() => setActivePanel('SEM')}
           >
             <img className="w-8 p-0.5 rounded-md"
-              src={'./imgsearch.png'}>
+              src={'./imgsearch.png'}
+              alt= "">
+              
             </img>
           </button>
 
@@ -52,7 +54,8 @@ const SidebarApp = () => {
             onClick={() => setActivePanel('TEMP')}
           >
             <img className="w-8 p-0.5 rounded-md"
-              src={'./temporalSearch.png'}>
+              src={'./temporalSearch.png'}
+              alt= "">
             </img>
           </button>
 
@@ -61,7 +64,8 @@ const SidebarApp = () => {
             onClick={() => setActivePanel('OCRASR')}
           >
             <img className="w-8 p-0.5 rounded-md"
-              src={'./OCRimg.png'}>
+              src={'./OCRimg.png'}
+              alt= "">
             </img>
           </button>
 
@@ -70,7 +74,8 @@ const SidebarApp = () => {
             onClick={() => setActivePanel('ASR')}
           >
             <img className="w-8 p-0.5 rounded-md"
-              src={'./audioImg.png'}>
+              src={'./audioImg.png'}
+              alt= "">
             </img>
           </button>
 
@@ -79,7 +84,8 @@ const SidebarApp = () => {
             onClick={() => setActivePanel('ObjectDetection')}
           >
             <img className="w-8 p-0.5 rounded-md"
-              src={'./ObjectDetectionIcon.png'}>
+              src={'./ObjectDetectionIcon.png'}
+              alt= "">
             </img>
 
           </button>
@@ -89,7 +95,8 @@ const SidebarApp = () => {
             onClick={() => setActivePanel('VQA')}
           >
             <img className="w-8 p-0.5 rounded-md"
-              src={'./messaging.jpg'}>
+              src={'./messaging.jpg'}
+              alt= "">
             </img>
 
           </button>
@@ -97,7 +104,7 @@ const SidebarApp = () => {
       </div>
 
       {/* Main Panel */}
-      <div className="flex-grow bg-white p-4 bg-gray-300">
+      <div className="flex-grow bg-white p-4 ">
         <div className="flex items-center justify-center my-4 gap-2">
           <label>K</label>
           <input type="range" min="1" max="200" value={numImages} onChange={(e) => setNumImages(e.target.value)} />

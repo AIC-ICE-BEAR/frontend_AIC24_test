@@ -1,24 +1,24 @@
 import React, { useRef, useEffect, useState } from "react";
 import { BsSkipForward, BsSkipBackward } from "react-icons/bs"; // Import the icons
-import { mapKeyframe, getImageListFromCSV } from '../utils/utils';
+import { mapKeyframe} from '../utils/utils';
 import { useCSVPreview } from '../../contexts/CSVPreviewContext'
 import { FaLink } from "react-icons/fa";
 import { FaPaperPlane } from "react-icons/fa6";
 
 const VideoPlayer = ({ videoUrl, frame_idx }) => {
   const videoRef = useRef(null);
-  const progressBarRef = useRef(null);
+  // const progressBarRef = useRef(null);
   const [startTime, setStartTime] = useState(0);
-  const [hoverTime, setHoverTime] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null);
-  const [imageFrames, setImageFrames] = useState([]);
-  const [preloadedImages, setPreloadedImages] = useState([]);
+  // const [hoverTime, setHoverTime] = useState(null);
+  // const [previewImage, setPreviewImage] = useState(null);
+  const [imageFrames] = useState([]);
+  // const [preloadedImages, setPreloadedImages] = useState([]);
   const [videoFPS, setVideoFPS] = useState(25);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  // const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const { submittedImages, setsubmittedImages } = useCSVPreview();
 
   const handleOpenImageInNewTab = (video_name) => {
-    const videoUrl = `${video_name.includes('_a') ? `${process.env.REACT_APP_VIDEO_PATH}/${video_name}.mp4`
+    const videoUrl = `${video_name.includes('_a') ? `${process.env.REACT_APP_VIDEO_PATH}/${video_name}_480p.mp4`
       : `${process.env.REACT_APP_VIDEO_PATH}/${video_name}_480p.mp4`}`;
     window.open(videoUrl, '_blank');
   };
@@ -99,12 +99,12 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
     });
   }, [imageFrames]);
 
-  const getPreloadedImage = (hoverTime) => {
-    const preloadedImage = preloadedImages.find(
-      (image) => hoverTime >= image.startTime && hoverTime <= image.endTime
-    );
-    return preloadedImage ? preloadedImage.frame : null;
-  };
+  // const getPreloadedImage = (hoverTime) => {
+  //   const preloadedImage = preloadedImages.find(
+  //     (image) => hoverTime >= image.startTime && hoverTime <= image.endTime
+  //   );
+  //   return preloadedImage ? preloadedImage.frame : null;
+  // };
 
   const skipForward = () => {
     if (videoRef.current) {
@@ -142,22 +142,22 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
     return closest;
   };
 
-  const handleMouseMove = (e) => {
-    const rect = progressBarRef.current.getBoundingClientRect();
-    const hoverPosX = e.clientX - rect.left;
-    const percentage = hoverPosX / rect.width;
-    const hoverTime = videoRef.current.duration * percentage;
+  // const handleMouseMove = (e) => {
+  //   const rect = progressBarRef.current.getBoundingClientRect();
+  //   const hoverPosX = e.clientX - rect.left;
+  //   const percentage = hoverPosX / rect.width;
+  //   const hoverTime = videoRef.current.duration * percentage;
 
-    setHoverTime(hoverTime);
-    const preloadedImage = getPreloadedImage(hoverTime);
-    setPreviewImage(preloadedImage);
-    setMousePosition({ x: e.clientX, y: e.clientY });
-  };
+  //   setHoverTime(hoverTime);
+  //   const preloadedImage = getPreloadedImage(hoverTime);
+  //   setPreviewImage(preloadedImage);
+  //   setMousePosition({ x: e.clientX, y: e.clientY });
+  // };
 
-  const handleMouseLeave = () => {
-    setHoverTime(null);
-    setPreviewImage(null);
-  };
+  // const handleMouseLeave = () => {
+  //   setHoverTime(null);
+  //   setPreviewImage(null);
+  // };
 
   // const handleProgressBarClick = (e) => {
   //   try {

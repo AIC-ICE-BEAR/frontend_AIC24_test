@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { BiSolidLike, BiSolidDislike } from 'react-icons/bi';
 import { FaLink } from 'react-icons/fa';
 
@@ -21,23 +21,20 @@ function TextSearchResult({
     // State to hold frame indices for each image
     const [frameIndices, setFrameIndices] = useState({});
 
-    // Effect to fetch keyframes for each image when the component mounts
-    useEffect(() => {
-        const fetchAllKeyframes = async () => {
-            const indices = {};
-            for (const item of displayResult) {
-                try {
-                    const index = await getkeyframe(item.video_name, item.keyframe_id);
-                    indices[`${item.video_name}-${item.keyframe_id}`] = index; // Store index using a unique key
-                } catch (error) {
-                    console.error("Error fetching keyframe:", error);
-                }
+    // Function to fetch keyframes for a specific image
+    const fetchKeyframe = async (videoName, keyframeId) => {
+        if (!frameIndices[`${videoName}-${keyframeId}`]) { // Only fetch if not already fetched
+            try {
+                const index = await getkeyframe(videoName, keyframeId);
+                setFrameIndices(prevIndices => ({
+                    ...prevIndices,
+                    [`${videoName}-${keyframeId}`]: index, // Update the frame index for the specific image
+                }));
+            } catch (error) {
+                console.error("Error fetching keyframe:", error);
             }
-            setFrameIndices(indices); // Update state with all frame indices
-        };
-
-        fetchAllKeyframes(); // Call the fetch function
-    }, [displayResult, getkeyframe]); // Dependency array
+        }
+    };
 
     return (
         <div className="overflow-y-auto h-screen">
@@ -61,7 +58,10 @@ function TextSearchResult({
                             src={`${process.env.REACT_APP_IMAGE_PATH}/${item.video_name}/${item.keyframe_id}.jpg`}
                             className="w-full h-auto"
                             alt={item.keyframe_id}
-                            onClick={() => handleImageClick(item.video_name, item.keyframe_id)}
+                            onClick={() => {
+                                handleImageClick(item.video_name, item.keyframe_id);
+                                fetchKeyframe(item.video_name, item.keyframe_id); // Fetch keyframe on image click
+                            }}
                             onDoubleClick={() => handleDoubleClick(item.video_name, item.keyframe_id)}
                         />
 

@@ -59,37 +59,37 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
     };
   }, [startTime]);
 
-  useEffect(() => {
-    const fetchImageList = async () => {
-      try {
-        const imageList = await getImageListFromCSV(videoUrl);
-        const updatedImageList = imageList.slice(0, -1); // Remove the last image if needed
-        setImageFrames(updatedImageList);
+  // useEffect(() => {
+  //   const fetchImageList = async () => {
+  //     try {
+  //       const imageList = await getImageListFromCSV(videoUrl);
+  //       const updatedImageList = imageList.slice(0, -1); // Remove the last image if needed
+  //       setImageFrames(updatedImageList);
 
-        if (videoRef.current) {
-          const videoDuration = videoRef.current.duration;
-          const mappedImages = updatedImageList.map((frame, index) => {
-            const frameTime = frame.time;
-            const nextFrameTime = updatedImageList[index + 1]?.time || videoDuration; // Handle the last frame
+  //       if (videoRef.current) {
+  //         const videoDuration = videoRef.current.duration;
+  //         const mappedImages = updatedImageList.map((frame, index) => {
+  //           const frameTime = frame.time;
+  //           const nextFrameTime = updatedImageList[index + 1]?.time || videoDuration; // Handle the last frame
 
-            return {
-              frame,
-              startTime: frameTime,
-              endTime: nextFrameTime,
-            };
-          });
+  //           return {
+  //             frame,
+  //             startTime: frameTime,
+  //             endTime: nextFrameTime,
+  //           };
+  //         });
 
-          setPreloadedImages(mappedImages);
-        }
-      } catch (error) {
-        console.error('Error fetching image list:', error);
-      }
-    };
+  //         setPreloadedImages(mappedImages);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching image list:', error);
+  //     }
+  //   };
 
-    if (videoUrl) {
-      fetchImageList();
-    }
-  }, [videoUrl]);
+  //   if (videoUrl) {
+  //     fetchImageList();
+  //   }
+  // }, [videoUrl]);
 
   // Preload images when the component mounts
   useEffect(() => {
@@ -159,17 +159,17 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
     setPreviewImage(null);
   };
 
-  const handleProgressBarClick = (e) => {
-    try {
-      const rect = progressBarRef.current.getBoundingClientRect();
-      const clickPosX = e.clientX - rect.left;
-      const percentage = clickPosX / rect.width;
-      const clickedTime = videoRef.current.duration * percentage;
-      videoRef.current.currentTime = clickedTime;
-    } catch (error) {
-      console.error('Error:', error.message);
-    }
-  };
+  // const handleProgressBarClick = (e) => {
+  //   try {
+  //     const rect = progressBarRef.current.getBoundingClientRect();
+  //     const clickPosX = e.clientX - rect.left;
+  //     const percentage = clickPosX / rect.width;
+  //     const clickedTime = videoRef.current.duration * percentage;
+  //     videoRef.current.currentTime = clickedTime;
+  //   } catch (error) {
+  //     console.error('Error:', error.message);
+  //   }
+  // };
 
   const getCurrentTime = () => {
     const currentTime = videoRef.current.currentTime;
@@ -192,7 +192,7 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
         <source
           src={
             videoUrl.includes('_a')
-              ? `${process.env.REACT_APP_VIDEO_PATH}/${videoUrl}.mp4`
+              ? `${process.env.REACT_APP_VIDEO_PATH}/${videoUrl}_480p.mp4`
               : `${process.env.REACT_APP_VIDEO_PATH}/${videoUrl}_480p.mp4`
           }
           type="video/mp4"
@@ -233,7 +233,7 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
       </div>
 
       {/* Progress bar with hover preview */}
-      <div
+      {/* <div
         className="relative w-full h-4 bg-gray-200 mt-2"
         ref={progressBarRef}
         onMouseMove={handleMouseMove}
@@ -263,7 +263,7 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
             <span>{Math.floor(hoverTime)}s</span>
           </div>
         )}
-      </div>
+      </div> */}
       <button
         className="mt-2 bg-blue-500 text-white p-2 rounded"
         onClick={getCurrentTime}

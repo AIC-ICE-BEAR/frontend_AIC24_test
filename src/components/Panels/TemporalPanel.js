@@ -21,7 +21,9 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
     const [TemporalMetric, setTemporalMetric] = useState("exp_dot");
 
     const [QueryLanguage, setQueryLanguage] = useState('en');
-    const [TranslateResult, setTranslateResult] = useState([])
+    // const [TranslateResult, setTranslateResult] = useState([])
+    const [SplitMode, setSplitMode] = useState(false);
+    const [isSplitSwitchChecked, setisSplitSwitchChecked] = useState(false);
     const [isLanguageSwitchChecked, setIsLanguageSwitchChecked] = useState(false);
     // if true then search for a sequence that start with that frame 
     // if false then search for a sequence that end with that frame 
@@ -30,6 +32,12 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
     const handleLanguageSwitch = (checked) => {
         setIsLanguageSwitchChecked(checked);
         setQueryLanguage(checked ? "vi" : "en");
+    };
+
+
+    const handleSplitSwitch = (checked) => {
+        setisSplitSwitchChecked(checked);
+        setSplitMode(checked ? true : false);
     };
 
 
@@ -83,11 +91,11 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
     };
 
 
-    const handleRemoveTranslate = (index) => {
+    // const handleRemoveTranslate = (index) => {
 
-        const newTranslateResult = TranslateResult.filter((_, i) => i !== index);
-        setTranslateResult(newTranslateResult);
-    };
+    //     const newTranslateResult = TranslateResult.filter((_, i) => i !== index);
+    //     setTranslateResult(newTranslateResult);
+    // };
 
     return (
         <div className="p-4 border-b max-h-full overflow-y-auto">
@@ -131,8 +139,14 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                 </div>
 
 
+                <div className="flex items-center justify-center my-4 gap-2">
+                    <label>Split query</label>
+                    <Switch onChange={handleSplitSwitch} checked={isSplitSwitchChecked} />
+                </div>
 
-                {TranslateResult.map((translatedQuery, index) => (
+
+
+                {/* {TranslateResult.map((translatedQuery, index) => (
                     <div >
                         query {index}
 
@@ -151,7 +165,7 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                             -
                         </button>
                     </div>
-                ))}
+                ))} */}
 
 
                 Enter here
@@ -166,13 +180,13 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                                 // Clean text before handling key press
                                 if (QueryLanguage == "vi") {
                                     if (e.key === 'Enter') {
-                                        const Translated = await handleKeyPressTranslate(e, textquerylist, setTranslateResult);
-                                        handleKeyPressTemporal(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMetric, ModelSelect, setTemporalResult, setSearchMode);
+                                        const Translated = await handleKeyPressTranslate(e, textquerylist);
+                                        handleKeyPressTemporal(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMetric, ModelSelect, setTemporalResult, SplitMode);
                                     }
                                 }
                                 else {
 
-                                    handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMetric, ModelSelect, setTemporalResult, setSearchMode);
+                                    handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMetric, ModelSelect, setTemporalResult, SplitMode);
                                 }
                                 setClipConfig(ModelSelect + "#" + numImages);
 

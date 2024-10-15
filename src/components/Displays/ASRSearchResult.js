@@ -21,7 +21,7 @@ function ASRSearchResult({
     useEffect(() => {
         const fetchAllKeyframes = async () => {
             const indices = {};
-            console.log(displayResult)
+
             for (const item of displayResult) {
                 for (const key_id of item.keyframe_id) {
                     try {

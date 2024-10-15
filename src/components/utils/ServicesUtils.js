@@ -291,14 +291,14 @@ export const handleKeyPressFused = async (e, queries, numImages, ModelSelect, se
   }
 };
 
-export const handleKeyPressTemporal = async (e, queries, numImages, TemporalMetric, ModelSelect, setSearchResult, setSearchMode) => {
+export const handleKeyPressTemporal = async (e, queries, numImages, TemporalMetric, ModelSelect, setSearchResult, SplitMode) => {
   if (e.key === 'Enter') {
 
 
     const toastId = toast.loading("Sending request...");
 
     try {
-      const response = await temporalservice.sendTemporalRequest(queries, numImages, TemporalMetric, ModelSelect);
+      const response = await temporalservice.sendTemporalRequest(queries, numImages, TemporalMetric, ModelSelect, SplitMode);
 
       toast.update(toastId, {
         render: "Request successful!",
@@ -323,11 +323,10 @@ export const handleKeyPressTemporal = async (e, queries, numImages, TemporalMetr
 
 
 
-export const handleKeyPressTranslate = async (e, queries, setTranslateResult) => {
+export const handleKeyPressTranslate = async (e, queries) => {
   if (e.key === 'Enter') {
     try {
       const response = await transalteservice.sendTranslateRequest(queries);
-      setTranslateResult(response.data.texts);
       return response.data.texts
     } catch (error) {
       console.log(error);

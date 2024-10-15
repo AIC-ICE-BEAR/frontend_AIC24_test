@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Switch from "react-switch";
+import { toast } from 'react-toastify';
 import { useSearchResult } from '../contexts/ClipsearchContext';
 import { useTemporalSearchResult } from '../contexts/TemporalSearchContext'
 import { useOCRSearchResult } from '../contexts/OCRsearchContext';
@@ -7,16 +9,16 @@ import { useVQASearchImage } from '../contexts/VQAImageContext'
 import { useASRSearchResult } from '../contexts/ASRsearchContext';
 import { useModeContext } from '../contexts/searchModeContext';
 import { useClipConfig } from '../contexts/ClipSearchConfigContext';
-import { useCSVPreview } from '../contexts/CSVPreviewContext'
 import { useVQASearchResult } from '../contexts/VQAContext';
 import { useSubmitContext } from '../contexts/SubmitImageContext';
 import { handleClickImgSim } from './utils/ServicesUtils'
+import submissionservice from '../services/submissionService';
 import renderNextImagesForm from './RenderForms/NextImages'
 import renderImagesSimilarityForm from './RenderForms/ImgSimilarity'
 import { VideoModal } from './RenderForms/VideoForm'
 import { mapKeyframe, createCSV, findImageFromFrameIdx } from './utils/utils'
 import { FaSearch } from "react-icons/fa";
-import { GiPlayButton } from "react-icons/gi";
+import { FaPaperPlane } from "react-icons/fa6";
 import { useFeedbackImage } from '../contexts/ImagesFeedBack'
 
 
@@ -24,7 +26,7 @@ import { useFeedbackImage } from '../contexts/ImagesFeedBack'
 import TextSearchResult from './Displays/TextSearchResult';
 import TemporalSearchResult from './Displays/TemporalSearchResult';
 import ASRSearchResult from './Displays/ASRSearchResult';
-import CSVPreview from './Displays/CSVPreview'
+
 
 function DisplayResult({ style }) {
   // Load results from context
@@ -63,17 +65,30 @@ function DisplayResult({ style }) {
   const [nextImages, setNextImages] = useState([]);
   const [selectedImage, setselectgedImage] = useState();
   const [selectedVideo, setSelectedVideo] = useState({ video_name: "", frame_idx: 0 });
-  const { ClipConfig } = useClipConfig();
-  const { submittedImages, setsubmittedImages } = useCSVPreview()
 
-  // For image visualization 
-  const [videoName, setvideoName] = useState('')
-  const [frameIdx, setframeIdx] = useState('')
+  const { ClipConfig } = useClipConfig();
+
+
+
+
+
+
+  const [IsModeSwitchChecked, setIsModeSwitchChecked] = useState(false)
+  const [submissionMode, setsubmissionMode] = useState('kis')
 
 
   // For image submission
+  const [vqaAnswer, setvqaAnswer] = useState()
+
   const { FBImage, setFBImage } = useFeedbackImage();
-  const { setSubmission } = useSubmitContext();
+  const { Submission, setSubmission } = useSubmitContext();
+
+
+  const handleModeSwitch = (checked) => {
+    setIsModeSwitchChecked(checked);
+    setsubmissionMode(checked ? "vqa" : "kis");
+  };
+
 
   useEffect(() => {
     // Reset scroll position to the top whenever searchResult changes
@@ -186,15 +201,30 @@ function DisplayResult({ style }) {
   };
 
 
-  const handleVQAClick = (vid_name, keyframe) => {
+  const handleVQAClick = async (vid_name, keyframe) => {
     const image_value = {
       video_name: vid_name,
       keyframe: keyframe
     }
 
-    console.log("sent to VQA image context", image_value)
     setVQAImage([...VQAImage, image_value])
+
+
+    const mapkeyframe = await getkeyframe(vid_name, keyframe);
+
+    const image_value_submit = {
+      video_name: vid_name,
+      frame_idx: mapkeyframe
+    }
+
+    setSubmission(image_value_submit)
   };
+
+
+
+
+
+
 
   const handleLikeClick = (video_name, keyframe_id) => {
     setFBImage(`+f ${video_name} ${keyframe_id}`)
@@ -205,25 +235,107 @@ function DisplayResult({ style }) {
   }
 
 
+  // Submission components
+
+  const handleVQASubmitClick = async (vid_name, keyframe, answer) => {
+
+    const video_name = vid_name.split('/')[1]
+
+    const toastId = toast.loading("Sending request...");
+
+    try {
+      const response = await submissionservice.sendVQARequest(video_name, keyframe, answer)
+      console.log("Dres response", response.data)
+      toast.update(toastId, {
+        render: "Request successful!",
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+
+      return { data: response.data, status: response.status };
+    } catch (error) {
+      console.log(error);
+      toast.update(toastId, {
+        render: `Error: ${error.message || 'Failed'}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+    }
+
+
+  };
+
+
+  const handleKISSubmitClick = async (vid_name, keyframe) => {
+
+    const video_name = vid_name.split('/')[1]
+    console.log("submitted", video_name, keyframe)
+
+    const toastId = toast.loading("Sending request...");
+
+    try {
+      const response = await submissionservice.sendKISRequest(video_name, keyframe)
+      toast.update(toastId, {
+        render: "Request successful!",
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
+      return { data: response.data, status: response.status };
+    } catch (error) {
+      console.log(error);
+      toast.update(toastId, {
+        render: `Error: ${error.message || 'Failed'}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+    }
+
+  };
+
+
 
   const submitSelectedImage = async () => {
     const splits = selectedImage.split('-')
+    const mapkeyframe = await getkeyframe(splits[0], splits[1]);
 
-    mapKeyframe(splits[0], splits[1])
-      .then(result => {
-        console.log("mapped keyframe", result);
-        submittedImages.push({ text: `${result.videoName.split('/').pop()}, ${result.frameIdx}`, image: splits[1] })
+    const image_value_submit = {
+      video_name: splits[0],
+      frame_idx: mapkeyframe
+    }
 
-        setSubmission(result)
-      })
-      .catch(error => {
-        console.error(error);
+    setSubmission(image_value_submit)
+
+    const toastId = toast.loading("Sending request...");
+
+
+    try {
+      const response = await submissionservice.sendKISRequest(splits[0], mapkeyframe)
+      toast.update(toastId, {
+        render: "Request successful!",
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
       });
+      return { data: response.data, status: response.status };
+    } catch (error) {
+      console.log(error);
+      toast.update(toastId, {
+        render: `Error: ${error.message || 'Failed'}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+    }
+
+
   };
 
-  const handleSubmissionRefresh = () => {
-    setsubmittedImages([])
-  }
+
 
   const handleImageClick = (vid_name, start_id) => {
     // this will handle image selection and submission
@@ -238,24 +350,9 @@ function DisplayResult({ style }) {
 
   const getkeyframe = async (videoName, imageId) => {
     const result = await mapKeyframe(videoName, imageId);
-
     return result.frameIdx
   }
 
-
-  const handleVisualizeImage = async (video_name, frame_idx) => {
-    try {
-      const { videoName: vName, imageId } = await findImageFromFrameIdx(video_name, frame_idx);
-
-      // Assuming your image URL is structured like this (modify if needed)
-      const imageURL = `${process.env.REACT_APP_IMAGE_PATH}/${vName}/${imageId}.jpg`;
-
-      // Open the image in a new tab/window
-      window.open(imageURL, '_blank');
-    } catch (error) {
-      console.error('Error:', error.message);
-    }
-  };
 
   return (
     <div className="block w-screen" style={style}>
@@ -279,49 +376,108 @@ function DisplayResult({ style }) {
           </div>
         )}
 
-        {/* <div className='flex pb-10 w-1/2 items-center'>
-          <p className='w-full px-2 py-2'>Visualize image</p>
+        <div className="flex items-center justify-center my-4 gap-2">
+          <label>KIS</label>
+          <Switch onChange={handleModeSwitch} checked={IsModeSwitchChecked} />
+          <label>VQA</label>
+        </div>
+        {submissionMode === 'vqa' ? (
+          <div className='flex pb-10 w-1/2 items-center'>
+            <p className='w-full px-2 py-2'>QA submission</p>
 
-          <input
-            className="shadow appearance-none border-2 rounded w-full py-2 px-2 flex-grow"
-            placeholder={`Enter video name`}
-            value={videoName}
-            onChange={(e) => setvideoName(e.target.value)}
-          />
-
-          <input
-            className="shadow appearance-none border-2 rounded w-full py-2 px-2 flex-grow"
-            placeholder={`Enter Frameidx`}
-            value={frameIdx}
-            onChange={(e) => setframeIdx(e.target.value)}
-          />
-          <div className='flex '>
-            <button
-              className="mt-4 py-2 px-2 bg-blue-500 text-white rounded"
-              onClick={() => handleVisualizeImage(videoName, frameIdx)}
-            >
-              <FaSearch />
-            </button>
-
-            <button
-              className="mt-4 py-2 px-2 bg-blue-500 text-white rounded"
-
-              onClick={async () => {
-                const keyframe = await findImageFromFrameIdx(videoName, frameIdx)
-                handlePlayVideoClick(videoName, keyframe.imageId)
+            <input
+              className="shadow appearance-none border-2 rounded w-full py-2 px-2 flex-grow"
+              placeholder={`Enter video name`}
+              value={Submission.video_name}
+              onChange={(e) => {
+                setSubmission(prevState => ({
+                  ...prevState,
+                  video_name: e.target.value
+                }))
               }}
-            >
-              <GiPlayButton />
-            </button>
-          </div>
-        </div> */}
 
-        {/* <CSVPreview
-          searchMode={searchMode}
-          displayResult={displayResult}
-          handleSubmissionRefresh={handleSubmissionRefresh}
-          createCSV={createCSV}
-        /> */}
+
+            />
+
+            <input
+              className="shadow appearance-none border-2 rounded w-full py-2 px-2 flex-grow"
+              placeholder={`Enter Frameidx`}
+              value={Submission.frame_idx}
+              onChange={(e) => {
+                setSubmission(prevState => ({
+                  ...prevState,
+                  frame_idx: e.target.value
+                }))
+              }}
+
+            />
+
+            <input
+              className="shadow appearance-none border-2 rounded w-full py-2 px-2 flex-grow"
+              placeholder={`Enter Answer`}
+              value={vqaAnswer}
+              onChange={(e) => setvqaAnswer(e.target.value)}
+
+            />
+            <div className='flex '>
+              <button
+                className="mt-4 py-2 px-2 bg-blue-500 text-white rounded"
+                onClick={() => handleVQASubmitClick(Submission.video_name, Submission.frame_idx, vqaAnswer)}
+
+              >
+                <FaPaperPlane />
+              </button>
+
+
+            </div>
+          </div>
+        ) : (
+          <div className='flex pb-10 w-1/2 items-center'>
+            <p className='w-full px-2 py-2'>KIS submission</p>
+
+            <input
+              className="shadow appearance-none border-2 rounded w-full py-2 px-2 flex-grow"
+              placeholder={`Enter video name`}
+              value={Submission.video_name}
+              onChange={(e) => {
+                setSubmission(prevState => ({
+                  ...prevState,
+                  video_name: e.target.value
+                }))
+              }}
+
+
+            />
+
+            <input
+              className="shadow appearance-none border-2 rounded w-full py-2 px-2 flex-grow"
+              placeholder={`Enter Frameidx`}
+              value={Submission.frame_idx}
+              onChange={(e) => {
+                setSubmission(prevState => ({
+                  ...prevState,
+                  frame_idx: e.target.value
+                }))
+              }}
+
+            />
+
+            <div className='flex '>
+              <button
+                className="mt-4 py-2 px-2 bg-blue-500 text-white rounded"
+                onClick={() => handleKISSubmitClick(Submission.video_name, Submission.frame_idx)}
+              >
+                <FaPaperPlane />
+              </button>
+
+
+            </div>
+
+
+          </div>
+        )}
+
+
 
 
 

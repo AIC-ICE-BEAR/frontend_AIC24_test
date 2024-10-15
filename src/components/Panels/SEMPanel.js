@@ -15,7 +15,6 @@ const SEMPanel = ({ numImages, setNumImages }) => {
 
   const [ModelSelect, setModelSelect] = useState('ViT-bigG-2B');
   const [Textquery, setTextquery] = useState('');
-  const [TranslateResult, setTranslateResult] = useState([])
   const [textquerylist, settextquerylist] = useState(['']); // Initialize with primary Textquery
   const [QueryLanguage, setQueryLanguage] = useState('Eng');
   const [isLanguageSwitchChecked, setIsLanguageSwitchChecked] = useState(false);
@@ -67,11 +66,6 @@ const SEMPanel = ({ numImages, setNumImages }) => {
     settextquerylist(newTextQueryList);
   };
 
-  const handleRemoveTranslate = (index) => {
-
-    const newTranslateResult = TranslateResult.filter((_, i) => i !== index);
-    setTranslateResult(newTranslateResult);
-  };
 
   return (
     <div className="p-4 border-b w-80 max-h-full overflow-y-auto">
@@ -100,30 +94,6 @@ const SEMPanel = ({ numImages, setNumImages }) => {
           <Switch onChange={handleLanguageSwitch} checked={isLanguageSwitchChecked} />
         </div>
 
-        {/* <div className="flex items-center justify-center my-4 gap-2">
-          <label>Eng</label>
-          <Switch onChange={handleLanguageSwitch} checked={isLanguageSwitchChecked} />
-          <label>Vie</label>
-        </div> */}
-        {TranslateResult.map((translatedQuery, index) => (
-          <div>
-            query {index}
-            <textarea
-              className="shadow appearance-none border-2 rounded w-full py-2 px-3 flex-grow"
-              value={translatedQuery}
-
-              rows="1"
-              style={{ height: 'auto' }}
-            />
-
-            <button
-              onClick={() => handleRemoveTranslate(index)}
-              className="ml-2 px-2 py-1 bg-red-500 text-white rounded"
-            >
-              -
-            </button>
-          </div>
-        ))}
 
         <p className="p-5">Enter here</p>
 
@@ -141,7 +111,7 @@ const SEMPanel = ({ numImages, setNumImages }) => {
                 if (textquerylist.length > 1) {
                   if (QueryLanguage == "Vie") {
                     if (e.key === 'Enter') {
-                      const Translated = await handleKeyPressTranslate(e, textquerylist, setTranslateResult);
+                      const Translated = await handleKeyPressTranslate(e, textquerylist);
 
                       console.log(Translated)
                       handleKeyPressFused(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode);
@@ -158,7 +128,7 @@ const SEMPanel = ({ numImages, setNumImages }) => {
                 } else {
                   handleKeyPressCLIP(e, cleanedText, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
                   if (QueryLanguage == "Vie") {
-                    handleKeyPressTranslate(e, [cleanedText], setTranslateResult)
+                    handleKeyPressTranslate(e, [cleanedText])
                   }
                   setClipConfig(ModelSelect + "#" + numImages);
                 }

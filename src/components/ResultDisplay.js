@@ -149,7 +149,7 @@ function DisplayResult({ style }) {
 
   useEffect(() => {
     const handleEnter = (event) => {
-      if (event.key === 'Enter' && selectedImage) {
+      if (event.key === 'Enter' && selectedImage && submissionMode === 'kis') {
         submitSelectedImage();
       }
     };

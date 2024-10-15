@@ -18,7 +18,8 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
   const { Submission, setSubmission } = useSubmitContext();
 
   const handleOpenImageInNewTab = (video_name) => {
-    const videoUrl = `${video_name.includes('_') ? `${process.env.REACT_APP_VIDEO_PATH}/${video_name}.mp4`
+    const videoUrl = `${(video_name.includes('_a') || video_name.includes('_b') || video_name.includes('_c') || video_name.includes('_d') || video_name.includes('_e')) ?
+      `${process.env.REACT_APP_VIDEO_PATH}/${video_name}.mp4`
       : `${process.env.REACT_APP_VIDEO_PATH}/${video_name}_480p.mp4`}`;
     window.open(videoUrl, '_blank');
   };
@@ -126,7 +127,7 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
       <video
         ref={videoRef}
         controls
-        width="600"
+        width="900"
         autoPlay
         muted
         controlsList="nodownload"
@@ -134,9 +135,8 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
       >
         <source
           src={
-            videoUrl.includes('_')
-              ? `${process.env.REACT_APP_VIDEO_PATH}/${videoUrl}.mp4`
-              : `${process.env.REACT_APP_VIDEO_PATH}/${videoUrl}_480p.mp4`
+            (videoUrl.includes('_a') || videoUrl.includes('_b') || videoUrl.includes('_c') || videoUrl.includes('_d') || videoUrl.includes('_e'))
+              ? `${process.env.REACT_APP_VIDEO_PATH}/${videoUrl}.mp4` : `${process.env.REACT_APP_VIDEO_PATH}/${videoUrl}_480p.mp4`
           }
           type="video/mp4"
         />
@@ -225,7 +225,7 @@ export const VideoModal = ({ currentVideo, setCurrentVideo, setwatchVideoformVis
         </button>
 
       </div>
-      <div className="overflow-y-auto max-h-[50vh] bg-white p-4 rounded w-full h-full">
+      <div className="overflow-y-auto max-h-[60vh] bg-white p-4 rounded w-full h-full">
         <VideoPlayer
           videoUrl={currentVideo.video_name}
           frame_idx={currentVideo.frame_idx}

@@ -259,7 +259,7 @@ export const handleClickImgSim = async (image, key_id, ClipConfig, setImageSimiR
 
 
 
-export const handleKeyPressFused = async (e, queries, numImages, ModelSelect, setSearchResult, setSearchMode) => {
+export const handleKeyPressFused = async (e, queries, numImages, ModelSelect, setSearchResult, setSearchMode, SplitMode) => {
   if (e.key === 'Enter') {
     console.log("send request Fused");
     console.log("queries", queries)
@@ -268,7 +268,7 @@ export const handleKeyPressFused = async (e, queries, numImages, ModelSelect, se
     const toastId = toast.loading("Sending request...");
 
     try {
-      const response = await fusedservice.sendFusedRequest(queries, numImages, ModelSelect);
+      const response = await fusedservice.sendFusedRequest(queries, numImages, ModelSelect, SplitMode);
 
       toast.update(toastId, {
         render: "Request successful!",

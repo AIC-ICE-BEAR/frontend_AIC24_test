@@ -19,12 +19,19 @@ const SEMPanel = ({ numImages, setNumImages }) => {
   const [QueryLanguage, setQueryLanguage] = useState('Eng');
   const [isLanguageSwitchChecked, setIsLanguageSwitchChecked] = useState(false);
   const { FBImage, setFBImage } = useFeedbackImage();
+  const [SplitMode, setSplitMode] = useState(false);
+  const [isSplitSwitchChecked, setisSplitSwitchChecked] = useState(false);
 
 
 
   const handleLanguageSwitch = (checked) => {
     setIsLanguageSwitchChecked(checked);
     setQueryLanguage(checked ? "Vie" : "Eng");
+  };
+
+  const handleSplitSwitch = (checked) => {
+    setisSplitSwitchChecked(checked);
+    setSplitMode(checked ? true : false);
   };
 
   const handleChangeMultiQuery = (index, value) => {
@@ -95,6 +102,12 @@ const SEMPanel = ({ numImages, setNumImages }) => {
         </div>
 
 
+        <div className="flex items-center justify-center my-4 gap-2">
+          <label>Split query</label>
+          <Switch onChange={handleSplitSwitch} checked={isSplitSwitchChecked} />
+        </div>
+
+
         <p className="p-5">Enter here</p>
 
         {textquerylist.map((query, index) => (
@@ -108,29 +121,36 @@ const SEMPanel = ({ numImages, setNumImages }) => {
                 // Clean text before handling key press
                 const cleanedText = query.trim().replace(/\s+/g, ' ');
 
-                if (textquerylist.length > 1) {
+                if (textquerylist.length > 1 || SplitMode === true) {
                   if (QueryLanguage == "Vie") {
                     if (e.key === 'Enter') {
                       const Translated = await handleKeyPressTranslate(e, textquerylist);
 
-                      console.log(Translated)
-                      handleKeyPressFused(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode);
+
+                      handleKeyPressFused(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode, SplitMode);
                     }
                   }
                   else {
-
-                    handleKeyPressFused(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode);
+                    if (e.key === 'Enter') {
+                      handleKeyPressFused(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode, SplitMode);
+                    }
                   }
 
 
 
                   setClipConfig(ModelSelect + "#" + numImages);
                 } else {
-                  handleKeyPressCLIP(e, cleanedText, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
-                  if (QueryLanguage == "Vie") {
-                    handleKeyPressTranslate(e, [cleanedText])
+                  if (e.key === 'Enter') {
+
+                    if (QueryLanguage == "Vie") {
+                      const Translated = await handleKeyPressTranslate(e, [cleanedText])
+
+                      handleKeyPressCLIP(e, Translated[0], numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
+                    } else {
+                      handleKeyPressCLIP(e, cleanedText, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
+                    }
+                    setClipConfig(ModelSelect + "#" + numImages);
                   }
-                  setClipConfig(ModelSelect + "#" + numImages);
                 }
               }}
               rows="1"

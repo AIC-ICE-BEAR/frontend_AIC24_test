@@ -54,7 +54,7 @@ function ASRSearchResult({
                                 />
 
 
-                                <div className="flex mt-2 justify-between">
+                                <div className="flex mt-2 justify-between items-center">
                                     <img className="w-8 p-0.5 rounded-md hover:bg-black" src={'./imgSim.png'}
                                         onClick={() => handleClickImgSim(item.video_name, key_id, ClipConfig, setImageSimiResult, setImageSimformVisible)}
                                         alt="img-sim" />
@@ -79,7 +79,8 @@ function ASRSearchResult({
                                         onClick={() => handleOpenImageInNewTab(item.video_name, key_id)}
                                         alt="direct-link" />
 
-                                    <MdSend onClick={() => submitSelectedImageClick(item.video_name, item.keyframe_id)}
+                                    <MdSend className="w-6 h-8 p-0.5 rounded-md border-2 hover:border-black cursor-pointer"
+                                        onClick={() => submitSelectedImageClick(item.video_name, key_id)}
                                         alt="sendsubmit" />
                                 </div>
 

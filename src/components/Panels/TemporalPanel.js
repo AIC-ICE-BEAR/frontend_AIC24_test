@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Switch from "react-switch";
 import { handleKeyPressTemporal } from "../utils/ServicesUtils";
 import { handleKeyPressTranslate } from '../utils/ServicesUtils'
-import { useSearchResult } from '../../contexts/ClipsearchContext';
+/home/tiendat / frontend_AIC24_test / scriptsimport { useSearchResult } from '../../contexts/ClipsearchContext';
 import { useModeContext } from '../../contexts/searchModeContext';
 import { useClipConfig } from '../../contexts/ClipSearchConfigContext';
 import { useTemporalSearchResult } from '../../contexts/TemporalSearchContext'
@@ -29,7 +29,7 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
 
 
     // Image distance
-    const [ImageDistance, setImageDistance] = useState(50);
+    const [ImageDistance, setImageDistance] = useState(-1);
 
 
 

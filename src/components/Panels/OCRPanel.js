@@ -12,12 +12,12 @@ const OCRPanel = ({ numImages, setNumImages }) => {
 
   const [OCRquery, setOCRquery] = useState('');
 
-  const [OCRMode, setOCRMode] = useState('fast');
+  const [OCRMode, setOCRMode] = useState("elastic");
   const [isOCRModeSwitchChecked, setisOCRModeSwitchChecked] = useState(false);
 
   const handlemodeSwitch = (checked) => {
     setisOCRModeSwitchChecked(checked);
-    setOCRMode(checked ? "elastic" : "fast");
+    setOCRMode(checked ? "fast" : "elastic");
   };
 
 
@@ -28,9 +28,9 @@ const OCRPanel = ({ numImages, setNumImages }) => {
       <div className="mb-5 ">
         <p>OCR</p>
         <div className="flex items-center justify-center my-4 gap-2">
-          <label>slow</label>
+          <label>Elastic</label>
           <Switch onChange={handlemodeSwitch} checked={isOCRModeSwitchChecked} />
-          <label>elastic</label>
+          <label>fast</label>
         </div>
 
         {/* <div className="flex items-center justify-center my-4 gap-2">

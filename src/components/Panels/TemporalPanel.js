@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Switch from "react-switch";
 import { handleKeyPressTemporal } from "../utils/ServicesUtils";
 import { handleKeyPressTranslate } from '../utils/ServicesUtils'
-/home/tiendat / frontend_AIC24_test / scriptsimport { useSearchResult } from '../../contexts/ClipsearchContext';
+import { useSearchResult } from '../../contexts/ClipsearchContext';
 import { useModeContext } from '../../contexts/searchModeContext';
 import { useClipConfig } from '../../contexts/ClipSearchConfigContext';
 import { useTemporalSearchResult } from '../../contexts/TemporalSearchContext'

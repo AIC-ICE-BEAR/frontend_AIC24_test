@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaLink } from 'react-icons/fa';
+import { MdSend } from "react-icons/md";
 function TemporalSearchResult({
     displayResult,
     selectedImage,
@@ -12,7 +13,8 @@ function TemporalSearchResult({
     ClipConfig,
     setImageSimiResult,
     setImageSimformVisible,
-    getkeyframe
+    getkeyframe,
+    submitSelectedImageClick
 }) {
     const [frameIndices, setFrameIndices] = useState({});
 
@@ -73,6 +75,8 @@ function TemporalSearchResult({
                                         <FaLink className="w-6 h-8 p-0.5 rounded-md border-2 hover:border-black cursor-pointer"
                                             onClick={() => handleOpenImageInNewTab(item.video_name, item.keyframe_id)}
                                             alt="direct-link" />
+                                        <MdSend onClick={() => submitSelectedImageClick(item.video_name, item.keyframe_id)}
+                                            alt="sendsubmit" />
                                     </div>
 
                                     {/* Display the image name */}

@@ -114,7 +114,7 @@ const SEMPanel = ({ numImages, setNumImages }) => {
           <div key={index} className="flex items-start gap-2 mb-2">
             <textarea
               className="shadow appearance-none border-2 rounded w-full py-2 px-3 flex-grow"
-              placeholder={`${index === 0 ? "Describe then scene" : "Describe what happens next"} `}
+              placeholder={`${index === 0 ? "Describe the scene" : "Describe what happens next"} `}
               value={query}
               onChange={(e) => handleChangeMultiQuery(index, e.target.value)}
               onKeyPress={async (e) => {
@@ -122,28 +122,30 @@ const SEMPanel = ({ numImages, setNumImages }) => {
                 const cleanedText = query.trim().replace(/\s+/g, ' ');
 
                 if (textquerylist.length > 1 || SplitMode === true) {
-                  if (QueryLanguage == "Vie") {
+                  if (QueryLanguage === "Vie") {
                     if (e.key === 'Enter') {
-                      const Translated = await handleKeyPressTranslate(e, textquerylist);
+                      // Filter out queries that start with +f or -f for translation, but keep them for fused handling
+                      const queriesToTranslate = textquerylist.filter(q => !q.startsWith('+f') && !q.startsWith('-f'));
+                      const Translated = await handleKeyPressTranslate(e, queriesToTranslate);
 
+                      const mergedQueries = textquerylist.map(q =>
+                        q.startsWith('+f') || q.startsWith('-f') ? q : Translated.shift().trim().replace(/\s+/g, ' ')
+                      );
 
-                      handleKeyPressFused(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode, SplitMode);
+                      handleKeyPressFused(e, mergedQueries, numImages, ModelSelect, setSearchResult, setSearchMode, SplitMode);
                     }
-                  }
-                  else {
+                  } else {
                     if (e.key === 'Enter') {
                       handleKeyPressFused(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode, SplitMode);
                     }
                   }
 
-
-
                   setClipConfig(ModelSelect + "#" + numImages);
                 } else {
                   if (e.key === 'Enter') {
-
-                    if (QueryLanguage == "Vie") {
-                      const Translated = await handleKeyPressTranslate(e, [cleanedText])
+                    if (QueryLanguage === "Vie") {
+                      const queriesToTranslate = [cleanedText].filter(q => !q.startsWith('+f') && !q.startsWith('-f'));
+                      const Translated = await handleKeyPressTranslate(e, queriesToTranslate);
 
                       handleKeyPressCLIP(e, Translated[0], numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
                     } else {
@@ -164,6 +166,7 @@ const SEMPanel = ({ numImages, setNumImages }) => {
             </button>
           </div>
         ))}
+
 
         <button
           onClick={addQueryBox}

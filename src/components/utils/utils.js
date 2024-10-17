@@ -25,7 +25,8 @@ export const mapKeyframe = async (videoName, keyFrameId) => {
             if (keyFrameIndex >= 0 && keyFrameIndex < data.length) {
               const frameIdx = data[keyFrameIndex]['frame_idx']; // Adjust if column name is different
               const videoSpeed = data[keyFrameIndex]['fps']
-              resolve({ videoName, frameIdx, videoSpeed });
+              const pts_time = data[keyFrameIndex]['pts_time']
+              resolve({ videoName, frameIdx, videoSpeed, pts_time });
             } else {
               reject('Invalid keyFrameId');
             }

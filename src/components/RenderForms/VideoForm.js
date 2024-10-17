@@ -113,11 +113,11 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
 
   const getCurrentTime = async () => {
     const currentTime = videoRef.current.currentTime;
-    const frame = Math.floor(currentTime * videoFPS);
 
+    const roundedTime = currentTime.toFixed(3);
     const image_value_submit = {
       video_name: videoUrl,
-      frame_idx: frame
+      time: roundedTime
     }
     setSubmission(image_value_submit)
   };

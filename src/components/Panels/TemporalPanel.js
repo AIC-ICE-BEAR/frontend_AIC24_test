@@ -25,8 +25,12 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
     const [SplitMode, setSplitMode] = useState(false);
     const [isSplitSwitchChecked, setisSplitSwitchChecked] = useState(false);
     const [isLanguageSwitchChecked, setIsLanguageSwitchChecked] = useState(false);
-    // if true then search for a sequence that start with that frame 
-    // if false then search for a sequence that end with that frame 
+
+
+
+    // Image distance
+    const [ImageDistance, setImageDistance] = useState(50);
+
 
 
     const handleLanguageSwitch = (checked) => {
@@ -133,6 +137,17 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                     </div>
                 </div>
 
+                <div>
+                    <label> Maximum distance</label>
+                    <input
+                        className="shadow appearance-none border-2 rounded py-2 px-2"
+                        placeholder={`Maximum distance`}
+                        value={ImageDistance}
+                        onChange={(e) => setImageDistance(e.target.value)}
+                    />
+
+                </div>
+
                 <div className="flex items-center justify-center my-4 gap-2">
                     <label>Translate</label>
                     <Switch onChange={handleLanguageSwitch} checked={isLanguageSwitchChecked} />
@@ -143,30 +158,6 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                     <label>Split query</label>
                     <Switch onChange={handleSplitSwitch} checked={isSplitSwitchChecked} />
                 </div>
-
-
-
-                {/* {TranslateResult.map((translatedQuery, index) => (
-                    <div >
-                        query {index}
-
-                        <textarea
-                            className="shadow appearance-none border-2 rounded w-full py-2 px-3 flex-grow"
-                            value={translatedQuery}
-
-                            rows="1"
-                            style={{ height: 'auto' }}
-                        />
-
-                        <button
-                            onClick={() => handleRemoveTranslate(index)}
-                            className="ml-2 px-2 py-1 bg-red-500 text-white rounded"
-                        >
-                            -
-                        </button>
-                    </div>
-                ))} */}
-
 
                 Enter here
                 {textquerylist.map((query, index) => (
@@ -181,12 +172,12 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                                 if (QueryLanguage == "vi") {
                                     if (e.key === 'Enter') {
                                         const Translated = await handleKeyPressTranslate(e, textquerylist);
-                                        handleKeyPressTemporal(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMetric, ModelSelect, setTemporalResult, SplitMode);
+                                        handleKeyPressTemporal(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMetric, ModelSelect, setTemporalResult, SplitMode, ImageDistance);
                                     }
                                 }
                                 else {
 
-                                    handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMetric, ModelSelect, setTemporalResult, SplitMode);
+                                    handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMetric, ModelSelect, setTemporalResult, SplitMode, ImageDistance);
                                 }
                                 setClipConfig(ModelSelect + "#" + numImages);
 

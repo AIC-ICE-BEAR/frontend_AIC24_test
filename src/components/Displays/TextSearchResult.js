@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BiSolidLike, BiSolidDislike } from 'react-icons/bi';
 import { FaLink } from 'react-icons/fa';
+import { MdSend } from "react-icons/md";
 
 function TextSearchResult({
     displayResult,
@@ -16,7 +17,8 @@ function TextSearchResult({
     ClipConfig,
     setImageSimiResult,
     setImageSimformVisible,
-    getkeyframe
+    getkeyframe,
+    submitSelectedImageClick
 }) {
     // State to hold frame indices for each image
     const [frameIndices, setFrameIndices] = useState({});
@@ -65,7 +67,7 @@ function TextSearchResult({
                             onDoubleClick={() => handleDoubleClick(item.video_name, item.keyframe_id)}
                         />
 
-                        <div className="flex mt-2 justify-between">
+                        <div className="flex mt-2 justify-between items-center">
                             <img className="w-8 p-0.5 rounded-md hover:bg-black" src={'./imgSim.png'}
                                 onClick={() => handleClickImgSim(item.video_name, item.keyframe_id, ClipConfig, setImageSimiResult, setImageSimformVisible)}
                                 alt="img-sim" />
@@ -87,6 +89,11 @@ function TextSearchResult({
                             <FaLink className="w-6 h-8 p-0.5 rounded-md border-2 hover:border-black cursor-pointer"
                                 onClick={() => handleOpenImageInNewTab(item.video_name, item.keyframe_id)}
                                 alt="direct-link" />
+
+                            <MdSend onClick={() => submitSelectedImageClick(item.video_name, item.keyframe_id)}
+                                alt="sendsubmit" />
+
+
                         </div>
 
                         {/* Display the image name and frame index */}

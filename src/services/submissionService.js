@@ -3,16 +3,32 @@ import axios from "axios";
 class SubmissionService {
     constructor() {
         this.axiosInstance = axios.create({
-            baseURL: 'localhost:btc link',
+            baseURL: process.env.REACT_APP_SUBMISSION,
         });
     }
 
-    async sendKISRequest(videoName, frame_idx) {
+    async sendKISRequest(videoName, time, sessionId, evaluationid) {
+
+        console.log("Sent", videoName, time)
         try {
-            const response = await this.axiosInstance.post('/post', {
-                "video name": videoName,
-                "frameidx": frame_idx
-            });
+            const response = await this.axiosInstance.post(`${evaluationid}`,
+                {
+                    "answerSets": [
+                        {
+                            "answers": [
+                                {
+                                    "mediaItemName": videoName,
+                                    "start": time,
+                                    "end": time
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    params: { session: sessionId } // Add sessionID as a query parameter
+                }
+            );
             console.log("Dres response", response.data)
             return { data: response.data, status: response.status };
         } catch (error) {
@@ -23,13 +39,26 @@ class SubmissionService {
     }
 
 
-    async sendVQARequest(videoName, frame_idx, vqaAnswer) {
+    async sendVQARequest(videoName, time, vqaAnswer, sessionId, evaluationid) {
+        console.log("Sent", videoName, time, vqaAnswer)
+
         try {
-            const response = await this.axiosInstance.post('/post', {
-                "video name": videoName,
-                "frameidx": frame_idx,
-                "answer": vqaAnswer
-            });
+            const response = await this.axiosInstance.post(`${evaluationid}`,
+                {
+                    "answerSets": [
+                        {
+                            "answers": [
+                                {
+                                    "text": `${vqaAnswer}-${videoName}-${time}`
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    params: { session: sessionId }
+                }
+            );
             console.log("Dres response", response.data)
             return { data: response.data, status: response.status };
         } catch (error) {

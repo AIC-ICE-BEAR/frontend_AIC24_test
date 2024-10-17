@@ -9,6 +9,7 @@ import fusedservice from '../../services/FusedSearchService'
 import transalteservice from '../../services/TranslateService'
 import ObjectColorservice from '../../services/ObjectColorService'
 import temporalservice from '../../services/TemporalService'
+import submissionservice from '../../services/submissionService';
 
 // handleKeyPressCLIP function
 export const handleKeyPressCLIP = async (e, Textquery, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode) => {
@@ -291,14 +292,14 @@ export const handleKeyPressFused = async (e, queries, numImages, ModelSelect, se
   }
 };
 
-export const handleKeyPressTemporal = async (e, queries, numImages, TemporalMetric, ModelSelect, setSearchResult, SplitMode) => {
+export const handleKeyPressTemporal = async (e, queries, numImages, TemporalMetric, ModelSelect, setSearchResult, SplitMode, ImageDistance) => {
   if (e.key === 'Enter') {
 
 
     const toastId = toast.loading("Sending request...");
 
     try {
-      const response = await temporalservice.sendTemporalRequest(queries, numImages, TemporalMetric, ModelSelect, SplitMode);
+      const response = await temporalservice.sendTemporalRequest(queries, numImages, TemporalMetric, ModelSelect, SplitMode, ImageDistance);
 
       toast.update(toastId, {
         render: "Request successful!",
@@ -333,4 +334,135 @@ export const handleKeyPressTranslate = async (e, queries) => {
 
     }
   }
+};
+
+
+
+export const handleKeyPressSubmissionKIS = async (video_name, time, sessionId, evaluationid) => {
+
+  const toastId = toast.loading("Sending request...");
+
+
+  try {
+    const response = await submissionservice.sendKISRequest(video_name, time * 1000, sessionId, evaluationid)
+    console.log("Dres response", response.data)
+    if (response.data.submission == 'WRONG') {
+      toast.update(toastId, {
+        render: `${response.data.submission}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+
+    }
+    else {
+
+      toast.update(toastId, {
+        render: `${response.data.submission}`,
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+    }
+
+
+
+    return { data: response.data, status: response.status };
+  } catch (error) {
+
+    if (error.status === 412) {
+      const errorMessage = 'Duplicated answer'
+      toast.update(toastId, {
+        render: `Error: ${errorMessage}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+    }
+    else {
+      const errorMessage = error.response && error.response.data
+        ? error.response.data.description || error.response.data.detail || error.response.data.message || 'An error occurred'
+        : 'Network error or no response from server';
+
+      // Update the toast with the error message
+      toast.update(toastId, {
+        render: `Error: ${errorMessage}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+    }
+
+  }
+};
+
+
+
+export const handleKeyPressSubmissionQA = async (video_name, time, answer, sessionId, evaluationid) => {
+
+  const toastId = toast.loading("Sending request...");
+
+
+
+  try {
+    const response = await submissionservice.sendVQARequest(video_name, time * 1000, answer, sessionId, evaluationid)
+    console.log("Dres response", response.data)
+    if (response.data.submission == 'WRONG') {
+      toast.update(toastId, {
+        render: `${response.data.submission}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+
+    }
+    else {
+
+      toast.update(toastId, {
+        render: `${response.data.submission}`,
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+    }
+
+
+
+    return { data: response.data, status: response.status };
+  } catch (error) {
+
+    if (error.status === 412) {
+      const errorMessage = 'Duplicated answer'
+      toast.update(toastId, {
+        render: `Error: ${errorMessage}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+    }
+    else {
+      const errorMessage = error.response && error.response.data
+        ? error.response.data.description || error.response.data.detail || error.response.data.message || 'An error occurred'
+        : 'Network error or no response from server';
+
+      // Update the toast with the error message
+      toast.update(toastId, {
+        render: `Error: ${errorMessage}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+    }
+
+
+
+
+  }
+
 };

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { BsSkipForward, BsSkipBackward } from "react-icons/bs"; // Import the icons
 import { mapKeyframe, getImageListFromCSV } from '../utils/utils';
-import { useCSVPreview } from '../../contexts/CSVPreviewContext'
+import { useSubmitContext } from '../../contexts/SubmitImageContext';
 import { FaLink } from "react-icons/fa";
 import { FaPaperPlane } from "react-icons/fa6";
 
@@ -11,14 +11,15 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
   const [startTime, setStartTime] = useState(0);
   const [hoverTime, setHoverTime] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-  const [imageFrames, setImageFrames] = useState([]);
+
   const [preloadedImages, setPreloadedImages] = useState([]);
   const [videoFPS, setVideoFPS] = useState(25);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const { submittedImages, setsubmittedImages } = useCSVPreview();
+  const { Submission, setSubmission } = useSubmitContext();
 
   const handleOpenImageInNewTab = (video_name) => {
-    const videoUrl = `${video_name.includes('_a') ? `${process.env.REACT_APP_VIDEO_PATH}/${video_name}.mp4`
+    const videoUrl = `${(video_name.includes('_a') || video_name.includes('_b') || video_name.includes('_c') || video_name.includes('_d') || video_name.includes('_e')) ?
+      `${process.env.REACT_APP_VIDEO_PATH}/${video_name}.mp4`
       : `${process.env.REACT_APP_VIDEO_PATH}/${video_name}_480p.mp4`}`;
     window.open(videoUrl, '_blank');
   };
@@ -59,45 +60,7 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
     };
   }, [startTime]);
 
-  // useEffect(() => {
-  //   const fetchImageList = async () => {
-  //     try {
-  //       const imageList = await getImageListFromCSV(videoUrl);
-  //       const updatedImageList = imageList.slice(0, -1); // Remove the last image if needed
-  //       setImageFrames(updatedImageList);
 
-  //       if (videoRef.current) {
-  //         const videoDuration = videoRef.current.duration;
-  //         const mappedImages = updatedImageList.map((frame, index) => {
-  //           const frameTime = frame.time;
-  //           const nextFrameTime = updatedImageList[index + 1]?.time || videoDuration; // Handle the last frame
-
-  //           return {
-  //             frame,
-  //             startTime: frameTime,
-  //             endTime: nextFrameTime,
-  //           };
-  //         });
-
-  //         setPreloadedImages(mappedImages);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching image list:', error);
-  //     }
-  //   };
-
-  //   if (videoUrl) {
-  //     fetchImageList();
-  //   }
-  // }, [videoUrl]);
-
-  // Preload images when the component mounts
-  useEffect(() => {
-    imageFrames.forEach((image) => {
-      const img = new Image();
-      img.src = image.imageUrl;
-    });
-  }, [imageFrames]);
 
   const getPreloadedImage = (hoverTime) => {
     const preloadedImage = preloadedImages.find(
@@ -118,29 +81,6 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
     }
   };
 
-  const findClosestImage = (hoverTime) => {
-    if (imageFrames.length === 0) return null;
-    let low = 0;
-    let high = imageFrames.length - 1;
-    while (low <= high) {
-      const mid = Math.floor((low + high) / 2);
-      const midTime = imageFrames[mid].time;
-
-      if (midTime === hoverTime) {
-        return imageFrames[mid];
-      } else if (midTime < hoverTime) {
-        low = mid + 1;
-      } else {
-        high = mid - 1;
-      }
-    }
-
-    const closest = (low < imageFrames.length && high >= 0)
-      ? (Math.abs(imageFrames[low]?.time - hoverTime) < Math.abs(imageFrames[high]?.time - hoverTime) ? imageFrames[low] : imageFrames[high])
-      : imageFrames[low] || imageFrames[high];
-
-    return closest;
-  };
 
   const handleMouseMove = (e) => {
     const rect = progressBarRef.current.getBoundingClientRect();
@@ -171,11 +111,15 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
   //   }
   // };
 
-  const getCurrentTime = () => {
+  const getCurrentTime = async () => {
     const currentTime = videoRef.current.currentTime;
-    const frame = Math.floor(currentTime * videoFPS);
-    const closestImage = findClosestImage(currentTime);
-    submittedImages.push({ text: `${videoUrl.split('/').pop()}, ${frame}`, image: closestImage.imageUrl.split('/').pop().slice(0, -4) });
+
+    const roundedTime = currentTime.toFixed(3);
+    const image_value_submit = {
+      video_name: videoUrl,
+      time: roundedTime
+    }
+    setSubmission(image_value_submit)
   };
 
   return (
@@ -183,7 +127,7 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
       <video
         ref={videoRef}
         controls
-        width="600"
+        width="900"
         autoPlay
         muted
         controlsList="nodownload"
@@ -191,21 +135,15 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
       >
         <source
           src={
-            videoUrl.includes('_a')
-              ? `${process.env.REACT_APP_VIDEO_PATH}/${videoUrl}_480p.mp4`
-              : `${process.env.REACT_APP_VIDEO_PATH}/${videoUrl}_480p.mp4`
+            (videoUrl.includes('_a') || videoUrl.includes('_b') || videoUrl.includes('_c') || videoUrl.includes('_d') || videoUrl.includes('_e'))
+              ? `${process.env.REACT_APP_VIDEO_PATH}/${videoUrl}.mp4` : `${process.env.REACT_APP_VIDEO_PATH}/${videoUrl}_480p.mp4`
           }
           type="video/mp4"
         />
         Your browser does not support the video tag.
       </video>
 
-      {/* Preload images but keep them hidden */}
-      <div className="hidden">
-        {imageFrames.map((image) => (
-          <img key={image.imageUrl} src={image.imageUrl} alt="" />
-        ))}
-      </div>
+
 
       <div className="absolute top-0 left-0 pointer-events-none flex justify-start items-center px-4">
         <button
@@ -265,7 +203,7 @@ const VideoPlayer = ({ videoUrl, frame_idx }) => {
         )}
       </div> */}
       <button
-        className="mt-2 bg-blue-500 text-white p-2 rounded"
+        className="mt-2 bg-red-500 text-white p-2 rounded"
         onClick={getCurrentTime}
       >
         <FaPaperPlane />
@@ -287,7 +225,7 @@ export const VideoModal = ({ currentVideo, setCurrentVideo, setwatchVideoformVis
         </button>
 
       </div>
-      <div className="overflow-y-auto max-h-[50vh] bg-white p-4 rounded w-full h-full">
+      <div className="overflow-y-auto max-h-[60vh] bg-white p-4 rounded w-full h-full">
         <VideoPlayer
           videoUrl={currentVideo.video_name}
           frame_idx={currentVideo.frame_idx}

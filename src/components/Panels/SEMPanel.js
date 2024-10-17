@@ -15,17 +15,23 @@ const SEMPanel = ({ numImages, setNumImages }) => {
 
   const [ModelSelect, setModelSelect] = useState('ViT-bigG-2B');
   const [Textquery, setTextquery] = useState('');
-  const [TranslateResult, setTranslateResult] = useState([])
   const [textquerylist, settextquerylist] = useState(['']); // Initialize with primary Textquery
   const [QueryLanguage, setQueryLanguage] = useState('Eng');
   const [isLanguageSwitchChecked, setIsLanguageSwitchChecked] = useState(false);
   const { FBImage, setFBImage } = useFeedbackImage();
+  const [SplitMode, setSplitMode] = useState(false);
+  const [isSplitSwitchChecked, setisSplitSwitchChecked] = useState(false);
 
 
 
   const handleLanguageSwitch = (checked) => {
     setIsLanguageSwitchChecked(checked);
     setQueryLanguage(checked ? "Vie" : "Eng");
+  };
+
+  const handleSplitSwitch = (checked) => {
+    setisSplitSwitchChecked(checked);
+    setSplitMode(checked ? true : false);
   };
 
   const handleChangeMultiQuery = (index, value) => {
@@ -67,11 +73,6 @@ const SEMPanel = ({ numImages, setNumImages }) => {
     settextquerylist(newTextQueryList);
   };
 
-  const handleRemoveTranslate = (index) => {
-
-    const newTranslateResult = TranslateResult.filter((_, i) => i !== index);
-    setTranslateResult(newTranslateResult);
-  };
 
   return (
     <div className="p-4 border-b w-80 max-h-full overflow-y-auto">
@@ -100,30 +101,12 @@ const SEMPanel = ({ numImages, setNumImages }) => {
           <Switch onChange={handleLanguageSwitch} checked={isLanguageSwitchChecked} />
         </div>
 
-        {/* <div className="flex items-center justify-center my-4 gap-2">
-          <label>Eng</label>
-          <Switch onChange={handleLanguageSwitch} checked={isLanguageSwitchChecked} />
-          <label>Vie</label>
-        </div> */}
-        {TranslateResult.map((translatedQuery, index) => (
-          <div>
-            query {index}
-            <textarea
-              className="shadow appearance-none border-2 rounded w-full py-2 px-3 flex-grow"
-              value={translatedQuery}
 
-              rows="1"
-              style={{ height: 'auto' }}
-            />
+        <div className="flex items-center justify-center my-4 gap-2">
+          <label>Split query</label>
+          <Switch onChange={handleSplitSwitch} checked={isSplitSwitchChecked} />
+        </div>
 
-            <button
-              onClick={() => handleRemoveTranslate(index)}
-              className="ml-2 px-2 py-1 bg-red-500 text-white rounded"
-            >
-              -
-            </button>
-          </div>
-        ))}
 
         <p className="p-5">Enter here</p>
 
@@ -131,36 +114,45 @@ const SEMPanel = ({ numImages, setNumImages }) => {
           <div key={index} className="flex items-start gap-2 mb-2">
             <textarea
               className="shadow appearance-none border-2 rounded w-full py-2 px-3 flex-grow"
-              placeholder={`${index === 0 ? "Describe then scene" : "Describe what happens next"} `}
+              placeholder={`${index === 0 ? "Describe the scene" : "Describe what happens next"} `}
               value={query}
               onChange={(e) => handleChangeMultiQuery(index, e.target.value)}
               onKeyPress={async (e) => {
                 // Clean text before handling key press
                 const cleanedText = query.trim().replace(/\s+/g, ' ');
 
-                if (textquerylist.length > 1) {
-                  if (QueryLanguage == "Vie") {
+                if (textquerylist.length > 1 || SplitMode === true) {
+                  if (QueryLanguage === "Vie") {
                     if (e.key === 'Enter') {
-                      const Translated = await handleKeyPressTranslate(e, textquerylist, setTranslateResult);
+                      // Filter out queries that start with +f or -f for translation, but keep them for fused handling
+                      const queriesToTranslate = textquerylist.filter(q => !q.startsWith('+f') && !q.startsWith('-f'));
+                      const Translated = await handleKeyPressTranslate(e, queriesToTranslate);
 
-                      console.log(Translated)
-                      handleKeyPressFused(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode);
+                      const mergedQueries = textquerylist.map(q =>
+                        q.startsWith('+f') || q.startsWith('-f') ? q : Translated.shift().trim().replace(/\s+/g, ' ')
+                      );
+
+                      handleKeyPressFused(e, mergedQueries, numImages, ModelSelect, setSearchResult, setSearchMode, SplitMode);
+                    }
+                  } else {
+                    if (e.key === 'Enter') {
+                      handleKeyPressFused(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode, SplitMode);
                     }
                   }
-                  else {
-
-                    handleKeyPressFused(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode);
-                  }
-
-
 
                   setClipConfig(ModelSelect + "#" + numImages);
                 } else {
-                  handleKeyPressCLIP(e, cleanedText, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
-                  if (QueryLanguage == "Vie") {
-                    handleKeyPressTranslate(e, [cleanedText], setTranslateResult)
+                  if (e.key === 'Enter') {
+                    if (QueryLanguage === "Vie") {
+                      const queriesToTranslate = [cleanedText].filter(q => !q.startsWith('+f') && !q.startsWith('-f'));
+                      const Translated = await handleKeyPressTranslate(e, queriesToTranslate);
+
+                      handleKeyPressCLIP(e, Translated[0], numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
+                    } else {
+                      handleKeyPressCLIP(e, cleanedText, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
+                    }
+                    setClipConfig(ModelSelect + "#" + numImages);
                   }
-                  setClipConfig(ModelSelect + "#" + numImages);
                 }
               }}
               rows="1"
@@ -174,6 +166,7 @@ const SEMPanel = ({ numImages, setNumImages }) => {
             </button>
           </div>
         ))}
+
 
         <button
           onClick={addQueryBox}

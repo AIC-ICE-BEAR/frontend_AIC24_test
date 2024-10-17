@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaLink } from 'react-icons/fa';
+import { MdSend } from "react-icons/md";
 function ASRSearchResult({
     displayResult,
     selectedImage,
@@ -12,7 +13,8 @@ function ASRSearchResult({
     ClipConfig,
     setImageSimiResult,
     setImageSimformVisible,
-    getkeyframe
+    getkeyframe,
+    submitSelectedImageClick
 }) {
 
     const [frameIndices, setFrameIndices] = useState({});
@@ -21,7 +23,7 @@ function ASRSearchResult({
     useEffect(() => {
         const fetchAllKeyframes = async () => {
             const indices = {};
-            console.log(displayResult)
+
             for (const item of displayResult) {
                 for (const key_id of item.keyframe_id) {
                     try {
@@ -76,6 +78,9 @@ function ASRSearchResult({
                                     <FaLink className="w-6 h-8 p-0.5 rounded-md border-2 hover:border-black cursor-pointer"
                                         onClick={() => handleOpenImageInNewTab(item.video_name, key_id)}
                                         alt="direct-link" />
+
+                                    <MdSend onClick={() => submitSelectedImageClick(item.video_name, item.keyframe_id)}
+                                        alt="sendsubmit" />
                                 </div>
 
                                 {/* Display the image name */}

@@ -29,16 +29,16 @@ const TextSession = ({ items }) => {
             // ];
 
             const initialMessages = [
-                { type: 'text', content: 'The scene begins in a supermarket in the Binh bag area. It ends with a scene of "Neptune" brand Japonica bags, with a price tag.', sender: 'user' },
+                { type: 'text', content: ' Scene in a classroom, the board below the classroom is decorated on the wall with 5 large flowers clearly visible in the order of blue, orange, yellow, green, red. Below these flowers indicate that this class is class 1A*', sender: 'user' },
                 {
                     type: 'image', content: {
-                        video_name: "L04/L04_V029",
-                        keyframe: 183
+                        video_name: "L08/L08_V008",
+                        keyframe: 406
                     }
                     , sender: 'bot'
                 },
-                { type: 'text', content: 'What percentage discount is written for this product?', sender: 'user' },
-                { type: 'text', content: 'The discount percentage is 19%', sender: 'bot' },
+                { type: 'text', content: ' What is the number *?', sender: 'user' },
+                { type: 'text', content: 'The class number is 9', sender: 'bot' },
             ];
             setSessionItems(initialMessages); // Reset to initial bot messages
         } else {

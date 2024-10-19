@@ -142,7 +142,7 @@ const SEMPanel = ({ numImages, setNumImages }) => {
                     }
                   } else {
                     if (e.key === 'Enter') {
-                      handleKeyPressFused(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, ModelSelect, setSearchResult, setSearchMode, SplitMode);
+                      handleKeyPressFused(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, QueryLanguage, ModelSelect, setSearchResult, setSearchMode, SplitMode);
                     }
                   }
 

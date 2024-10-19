@@ -184,7 +184,7 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                                 }
                                 else {
 
-                                    handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMetric, ModelSelect, setTemporalResult, SplitMode, ImageDistance);
+                                    handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, QueryLanguage, TemporalMetric, ModelSelect, setTemporalResult, SplitMode, ImageDistance);
                                 }
                                 setClipConfig(ModelSelect + "#" + numImages);
 

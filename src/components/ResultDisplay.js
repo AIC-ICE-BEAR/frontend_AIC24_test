@@ -311,7 +311,7 @@ function DisplayResult({ style }) {
 
   const handleSessionIDClick = async () => {
     const sessionID = await sessionservice.getsessionID()
-    const response = await sessionservice.getEvaluationID()
+    const response = await sessionservice.getEvaluationID(sessionID.data.sessionId)
     setsessionId(sessionID.data.sessionId)
     setevaluationid(response.data[0].id)
   }

@@ -27,10 +27,10 @@ class SessionIDService {
     }
 
 
-    async getEvaluationID() {
+    async getEvaluationID(session) {
 
         try {
-            const response = await this.axiosInstance.get(`/client/evaluation/list?session=${process.env.REACT_APP_SESSIONID}`,
+            const response = await this.axiosInstance.get(`/client/evaluation/list?session=${session}`,
 
             );
             console.log("Dres response", response.data)

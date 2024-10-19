@@ -29,7 +29,7 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
 
 
     // Image distance
-    const [ImageDistance, setImageDistance] = useState(50);
+    const [ImageDistance, setImageDistance] = useState(-1);
 
 
 

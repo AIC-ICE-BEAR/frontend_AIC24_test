@@ -35,7 +35,7 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
 
     const handleLanguageSwitch = (checked) => {
         setIsLanguageSwitchChecked(checked);
-        setQueryLanguage(checked ? "vi" : "en");
+        setQueryLanguage(checked ? "Vie" : "en");
     };
 
 
@@ -166,13 +166,20 @@ const TemporalPanel = ({ numImages, setNumImages }) => {
                             className="shadow appearance-none border-2 rounded w-full py-2 px-3 flex-grow"
                             placeholder={`${index === 0 ? "Describe then scene" : "Describe what happens next"} `}
                             value={query}
-                            onChange={(e) => handleChangeMultiQuery(index, e.target.value)}
+                            onChange={(e) => {
+
+                                return handleChangeMultiQuery(index, e.target.value)
+                            }}
                             onKeyPress={async (e) => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault()
+                                }
+
                                 // Clean text before handling key press
-                                if (QueryLanguage == "vi") {
+                                if (QueryLanguage == "Vie") {
                                     if (e.key === 'Enter') {
-                                        const Translated = await handleKeyPressTranslate(e, textquerylist);
-                                        handleKeyPressTemporal(e, Translated.map(q => q.trim().replace(/\s+/g, ' ')), numImages, TemporalMetric, ModelSelect, setTemporalResult, SplitMode, ImageDistance);
+                                        // const Translated = await handleKeyPressTranslate(e, textquerylist);
+                                        handleKeyPressTemporal(e, textquerylist.map(q => q.trim().replace(/\s+/g, ' ')), numImages, QueryLanguage, TemporalMetric, ModelSelect, setTemporalResult, SplitMode, ImageDistance);
                                     }
                                 }
                                 else {

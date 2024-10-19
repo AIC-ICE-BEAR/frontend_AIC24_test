@@ -35,6 +35,7 @@ const SEMPanel = ({ numImages, setNumImages }) => {
   };
 
   const handleChangeMultiQuery = (index, value) => {
+
     const newTextQueryList = [...textquerylist];
     newTextQueryList[index] = value;
     settextquerylist(newTextQueryList);
@@ -116,8 +117,13 @@ const SEMPanel = ({ numImages, setNumImages }) => {
               className="shadow appearance-none border-2 rounded w-full py-2 px-3 flex-grow"
               placeholder={`${index === 0 ? "Describe the scene" : "Describe what happens next"} `}
               value={query}
-              onChange={(e) => handleChangeMultiQuery(index, e.target.value)}
+              onChange={(e) =>
+                handleChangeMultiQuery(index, e.target.value)}
               onKeyPress={async (e) => {
+
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                }
                 // Clean text before handling key press
                 const cleanedText = query.trim().replace(/\s+/g, ' ');
 
@@ -125,14 +131,14 @@ const SEMPanel = ({ numImages, setNumImages }) => {
                   if (QueryLanguage === "Vie") {
                     if (e.key === 'Enter') {
                       // Filter out queries that start with +f or -f for translation, but keep them for fused handling
-                      const queriesToTranslate = textquerylist.filter(q => !q.startsWith('+f') && !q.startsWith('-f'));
-                      const Translated = await handleKeyPressTranslate(e, queriesToTranslate);
+                      // const queriesToTranslate = textquerylist.filter(q => !q.startsWith('+f') && !q.startsWith('-f'));
+                      // const Translated = await handleKeyPressTranslate(e, queriesToTranslate);
 
-                      const mergedQueries = textquerylist.map(q =>
-                        q.startsWith('+f') || q.startsWith('-f') ? q : Translated.shift().trim().replace(/\s+/g, ' ')
-                      );
+                      // const mergedQueries = textquerylist.map(q =>
+                      //   q.startsWith('+f') || q.startsWith('-f') ? q : Translated.shift().trim().replace(/\s+/g, ' ')
+                      // );
 
-                      handleKeyPressFused(e, mergedQueries, numImages, ModelSelect, setSearchResult, setSearchMode, SplitMode);
+                      handleKeyPressFused(e, textquerylist, numImages, QueryLanguage, ModelSelect, setSearchResult, setSearchMode, SplitMode);
                     }
                   } else {
                     if (e.key === 'Enter') {
@@ -143,14 +149,9 @@ const SEMPanel = ({ numImages, setNumImages }) => {
                   setClipConfig(ModelSelect + "#" + numImages);
                 } else {
                   if (e.key === 'Enter') {
-                    if (QueryLanguage === "Vie") {
-                      const queriesToTranslate = [cleanedText].filter(q => !q.startsWith('+f') && !q.startsWith('-f'));
-                      const Translated = await handleKeyPressTranslate(e, queriesToTranslate);
 
-                      handleKeyPressCLIP(e, Translated[0], numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
-                    } else {
-                      handleKeyPressCLIP(e, cleanedText, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
-                    }
+                    handleKeyPressCLIP(e, cleanedText, numImages, ModelSelect, QueryLanguage, setSearchResult, setSearchMode);
+
                     setClipConfig(ModelSelect + "#" + numImages);
                   }
                 }

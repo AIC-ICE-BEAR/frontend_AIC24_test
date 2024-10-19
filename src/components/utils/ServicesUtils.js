@@ -260,7 +260,7 @@ export const handleClickImgSim = async (image, key_id, ClipConfig, setImageSimiR
 
 
 
-export const handleKeyPressFused = async (e, queries, numImages, ModelSelect, setSearchResult, setSearchMode, SplitMode) => {
+export const handleKeyPressFused = async (e, queries, numImages, QueryLanguage, ModelSelect, setSearchResult, setSearchMode, SplitMode) => {
   if (e.key === 'Enter') {
     console.log("send request Fused");
     console.log("queries", queries)
@@ -269,7 +269,7 @@ export const handleKeyPressFused = async (e, queries, numImages, ModelSelect, se
     const toastId = toast.loading("Sending request...");
 
     try {
-      const response = await fusedservice.sendFusedRequest(queries, numImages, ModelSelect, SplitMode);
+      const response = await fusedservice.sendFusedRequest(queries, numImages, QueryLanguage, ModelSelect, SplitMode);
 
       toast.update(toastId, {
         render: "Request successful!",
@@ -292,14 +292,14 @@ export const handleKeyPressFused = async (e, queries, numImages, ModelSelect, se
   }
 };
 
-export const handleKeyPressTemporal = async (e, queries, numImages, TemporalMetric, ModelSelect, setSearchResult, SplitMode, ImageDistance) => {
+export const handleKeyPressTemporal = async (e, queries, numImages, QueryLanguage, TemporalMetric, ModelSelect, setSearchResult, SplitMode, ImageDistance) => {
   if (e.key === 'Enter') {
 
 
     const toastId = toast.loading("Sending request...");
 
     try {
-      const response = await temporalservice.sendTemporalRequest(queries, numImages, TemporalMetric, ModelSelect, SplitMode, ImageDistance);
+      const response = await temporalservice.sendTemporalRequest(queries, numImages, QueryLanguage, TemporalMetric, ModelSelect, SplitMode, ImageDistance);
 
       toast.update(toastId, {
         render: "Request successful!",

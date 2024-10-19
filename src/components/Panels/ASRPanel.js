@@ -45,6 +45,10 @@ const ASRPanel = ({ numImages, setNumImages }) => {
                     onChange={(e) => setASRquery(e.target.value)}
 
                     onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault()
+                        }
+
                         handleKeyPressASR(e, ASRquery, ASRMode, numImages, setASRResult, setSearchMode)
                     }}
                     rows="1"

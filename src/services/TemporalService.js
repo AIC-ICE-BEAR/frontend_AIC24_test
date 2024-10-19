@@ -7,12 +7,13 @@ class TemporalService {
         });
     }
 
-    async sendTemporalRequest(queries, numImages, TemporalMetric, model, SplitMode, ImageDistance) {
+    async sendTemporalRequest(queries, numImages, QueryLanguage, TemporalMetric, model, SplitMode, ImageDistance) {
         try {
             const response = await this.axiosInstance.post('/temporal_search', {
                 "query": queries,
                 "topk": numImages,
                 "model": model,
+                "language": QueryLanguage,
                 "metric": TemporalMetric,
                 "gpt_split": SplitMode,
                 "max_frame_dist": ImageDistance

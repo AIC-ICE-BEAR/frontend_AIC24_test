@@ -7,12 +7,13 @@ class FusedService {
         });
     }
 
-    async sendFusedRequest(queries, numImages, model, SplitMode) {
+    async sendFusedRequest(queries, numImages, QueryLanguage, model, SplitMode) {
         try {
             const response = await this.axiosInstance.post('/fuse_search', {
                 "query": queries,
                 "topk": numImages,
                 "model": model,
+                "language": QueryLanguage,
                 "gpt_split": SplitMode,
 
             });

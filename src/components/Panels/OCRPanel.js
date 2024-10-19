@@ -42,7 +42,12 @@ const OCRPanel = ({ numImages, setNumImages }) => {
           placeholder="Fill query and press enter"
           value={OCRquery}
           onChange={(e) => setOCRquery(e.target.value)}
-          onKeyPress={(e) => handleKeyPressOCR(e, OCRquery, numImages, OCRMode, setOCRResult, setSearchMode)}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+            }
+            handleKeyPressOCR(e, OCRquery, numImages, OCRMode, setOCRResult, setSearchMode)
+          }}
           rows="1"
           style={{ height: 'auto' }}
         />
